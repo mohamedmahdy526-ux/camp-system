@@ -910,11 +910,7 @@
     });
 
     // Populate URLs
-    var baseUrl = window.location.href.split('?')[0];
-    // If running inside iframe, use standard base URL path, fallback to window.location
-    if (baseUrl.indexOf("userCodeAppPanel") !== -1) {
-      baseUrl = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
-    }
+    var baseUrl = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
     
     document.getElementById("link-attendance-url").value = baseUrl;
     document.getElementById("link-quiz-url").value = baseUrl + "?page=quiz";
