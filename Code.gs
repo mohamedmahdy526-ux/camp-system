@@ -30,7 +30,7 @@ function doGet(e) {
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .addMetaTag("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
   } else {
-    var template = HtmlService.createTemplateFromFile("Index");
+    var template = HtmlService.createTemplateFromFile("AttendanceIndex");
     return template.evaluate()
       .setTitle("نظام تسجيل الحضور والغياب الكامب التدريبي")
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
