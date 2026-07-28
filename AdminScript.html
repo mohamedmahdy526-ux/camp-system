@@ -40,12 +40,54 @@
 
   var API_URL = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
 
+  function getMockResponse(action, args) {
+    if (action === "verifyAdminPIN") {
+      if (args[0] === "1234") return true;
+      return { error: "رمز التحقق غير صحيح" };
+    }
+    if (action === "getAdminDashboardData") {
+      return {
+        settings: {
+          CampName: "مبادرة ما ينفع الناس - كامب التمريض",
+          CurrentSession: "0",
+          MinAttendance: 5,
+          Attendance: "OPEN",
+          Quiz: "CLOSED",
+          Feedback: "CLOSED",
+          LogoURL: "",
+          FacebookURL: "https://www.facebook.com/maynfa3.alnas",
+          FeedbackSession: "0"
+        },
+        stats: {
+          totalRegistered: 154,
+          currentSessionAttendees: 89,
+          currentSessionQuizTakers: 42,
+          averageQuizScore: 8.5
+        }
+      };
+    }
+    if (action === "updateAdminSettings") {
+      return { success: true };
+    }
+    return { error: "Unknown mock action" };
+  }
+
   function callServerOption(action, args, onSuccess, onFailure) {
     if (typeof google !== 'undefined' && google.script && google.script.run) {
       var runner = google.script.run;
       if (onSuccess) runner = runner.withSuccessHandler(onSuccess);
       if (onFailure) runner = runner.withFailureHandler(onFailure);
       runner[action].apply(runner, args);
+    } else if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log("[Mock Server] Called " + action + " with args:", args);
+      setTimeout(function() {
+        var mockResult = getMockResponse(action, args);
+        if (mockResult && mockResult.error) {
+          if (onFailure) onFailure(new Error(mockResult.error));
+        } else {
+          if (onSuccess) onSuccess(mockResult);
+        }
+      }, 500);
     } else {
       // Hybrid mode - call Apps Script via HTTP fetch POST
       fetch(API_URL, {
