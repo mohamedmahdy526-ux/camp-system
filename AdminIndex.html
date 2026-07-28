@@ -85,115 +85,119 @@
           </div>
         </div>
 
-        <!-- Section: Configuration Form -->
-        <div class="admin-card">
-          <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
+        <!-- Main Dashboard Content Grid -->
+        <div class="dashboard-grid-container">
           
-          <div class="form-group">
-            <label for="select-admin-session" class="form-label">المحاضرة النشطة حالياً (الحضور والكويز):</label>
-            <select id="select-admin-session" class="form-select">
-              <!-- Dynamically populated options S0..S15 -->
-            </select>
-          </div>
-
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="select-admin-feedback-session" class="form-label">المحاضرة النشطة لاستبيان التقييم (Feedback):</label>
-            <select id="select-admin-feedback-session" class="form-select">
-              <!-- Dynamically populated options S0..S15 -->
-            </select>
-          </div>
-
-          <div class="toggle-group">
-            <div>
-              <div class="toggle-title">تسجيل الحضور والتحضير</div>
-              <div class="toggle-desc">فتح أو إغلاق إمكانية التحضير للطلاب</div>
+          <!-- Section: Configuration Form -->
+          <div class="admin-card">
+            <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
+            
+            <div class="form-group">
+              <label for="select-admin-session" class="form-label">المحاضرة النشطة حالياً (الحضور والكويز):</label>
+              <select id="select-admin-session" class="form-select">
+                <!-- Dynamically populated options S0..S15 -->
+              </select>
             </div>
-            <label class="switch">
-              <input type="checkbox" id="toggle-attendance-status">
-              <span class="slider round"></span>
-            </label>
-          </div>
 
-          <div class="toggle-group" style="margin-top: 15px;">
-            <div>
-              <div class="toggle-title">تفعيل الكويز التفاعلي</div>
-              <div class="toggle-desc">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="select-admin-feedback-session" class="form-label">المحاضرة النشطة لاستبيان التقييم (Feedback):</label>
+              <select id="select-admin-feedback-session" class="form-select">
+                <!-- Dynamically populated options S0..S15 -->
+              </select>
             </div>
-            <label class="switch">
-              <input type="checkbox" id="toggle-quiz-status">
-              <span class="slider round"></span>
-            </label>
-          </div>
 
-          <div class="toggle-group" style="margin-top: 15px;">
-            <div>
-              <div class="toggle-title">تفعيل استطلاع الرأي والتقييم</div>
-              <div class="toggle-desc">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
+            <div class="toggle-group">
+              <div>
+                <div class="toggle-title">تسجيل الحضور والتحضير</div>
+                <div class="toggle-desc">فتح أو إغلاق إمكانية التحضير للطلاب</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-attendance-status">
+                <span class="slider round"></span>
+              </label>
             </div>
-            <label class="switch">
-              <input type="checkbox" id="toggle-feedback-status">
-              <span class="slider round"></span>
-            </label>
+
+            <div class="toggle-group" style="margin-top: 15px;">
+              <div>
+                <div class="toggle-title">تفعيل الكويز التفاعلي</div>
+                <div class="toggle-desc">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-quiz-status">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="toggle-group" style="margin-top: 15px;">
+              <div>
+                <div class="toggle-title">تفعيل استطلاع الرأي والتقييم</div>
+                <div class="toggle-desc">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-feedback-status">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="input-admin-camp-name" class="form-label">اسم الكامب التدريبي:</label>
+              <input type="text" id="input-admin-camp-name" class="form-input" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="input-admin-min-attendance" class="form-label">الحد الأدنى للمحاضرات للشهادة:</label>
+              <input type="number" id="input-admin-min-attendance" class="form-input" min="1" max="16" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="input-admin-logo-url" class="form-label">رابط لوجو الكامب (جوجل درايف أو رابط مباشر):</label>
+              <input type="text" id="input-admin-logo-url" class="form-input" placeholder="مثال: https://drive.google.com/file/d/...">
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="input-admin-facebook-url" class="form-label">رابط صفحة فيسبوك الرسمية للمبادرة:</label>
+              <input type="text" id="input-admin-facebook-url" class="form-input" placeholder="https://www.facebook.com/yourpage">
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
+              <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
+            </div>
+
+            <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+              حفظ التغييرات وتعميمها 💾
+            </button>
           </div>
 
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="input-admin-camp-name" class="form-label">اسم الكامب التدريبي:</label>
-            <input type="text" id="input-admin-camp-name" class="form-input" required>
-          </div>
+          <!-- Section: Links & Announcements -->
+          <div class="admin-card">
+            <h3 class="card-title">روابط النشر والإعلان 🔗</h3>
 
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="input-admin-min-attendance" class="form-label">الحد الأدنى للمحاضرات للشهادة:</label>
-            <input type="number" id="input-admin-min-attendance" class="form-input" min="1" max="16" required>
-          </div>
+            <div class="link-item">
+              <div class="link-label">رابط تسجيل الحضور للطلاب:</div>
+              <div class="link-row">
+                <input type="text" id="link-attendance-url" readonly class="form-input link-readonly">
+                <button onclick="copyToClipboard('link-attendance-url')" class="btn btn-secondary">نسخ</button>
+              </div>
+            </div>
 
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="input-admin-logo-url" class="form-label">رابط لوجو الكامب (جوجل درايف أو رابط مباشر):</label>
-            <input type="text" id="input-admin-logo-url" class="form-input" placeholder="مثال: https://drive.google.com/file/d/...">
-          </div>
+            <div class="link-item">
+              <div class="link-label">رابط الكويز المخصص للطلاب:</div>
+              <div class="link-row">
+                <input type="text" id="link-quiz-url" readonly class="form-input link-readonly">
+                <button onclick="copyToClipboard('link-quiz-url')" class="btn btn-secondary">نسخ</button>
+              </div>
+            </div>
 
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="input-admin-facebook-url" class="form-label">رابط صفحة فيسبوك الرسمية للمبادرة:</label>
-            <input type="text" id="input-admin-facebook-url" class="form-input" placeholder="https://www.facebook.com/yourpage">
-          </div>
-
-          <div class="form-group" style="margin-top: 15px;">
-            <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
-            <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
-          </div>
-
-          <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
-            حفظ التغييرات وتعميمها 💾
-          </button>
-        </div>
-
-        <!-- Section: Links & Announcements -->
-        <div class="admin-card" style="margin-top: 20px;">
-          <h3 class="card-title">روابط النشر والإعلان 🔗</h3>
-
-          <div class="link-item">
-            <div class="link-label">رابط تسجيل الحضور للطلاب:</div>
-            <div class="link-row">
-              <input type="text" id="link-attendance-url" readonly class="form-input link-readonly">
-              <button onclick="copyToClipboard('link-attendance-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-item">
+              <div class="link-label">رابط استطلاع الرأي المخصص للطلاب:</div>
+              <div class="link-row">
+                <input type="text" id="link-feedback-url" readonly class="form-input link-readonly">
+                <button onclick="copyToClipboard('link-feedback-url')" class="btn btn-secondary">نسخ</button>
+              </div>
             </div>
           </div>
-
-          <div class="link-item">
-            <div class="link-label">رابط الكويز المخصص للطلاب:</div>
-            <div class="link-row">
-              <input type="text" id="link-quiz-url" readonly class="form-input link-readonly">
-              <button onclick="copyToClipboard('link-quiz-url')" class="btn btn-secondary">نسخ</button>
-            </div>
-          </div>
-
-          <div class="link-item">
-            <div class="link-label">رابط استطلاع الرأي المخصص للطلاب:</div>
-            <div class="link-row">
-              <input type="text" id="link-feedback-url" readonly class="form-input link-readonly">
-              <button onclick="copyToClipboard('link-feedback-url')" class="btn btn-secondary">نسخ</button>
-            </div>
-          </div>
-
+          
         </div>
       </div>
     </div>

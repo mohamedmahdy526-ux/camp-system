@@ -394,6 +394,15 @@
 
     if (!targetScreen) return;
 
+    var container = document.querySelector('.app-container');
+    if (container) {
+      if (screenId === 'screen-admin-dashboard') {
+        container.classList.add('dashboard-mode');
+      } else {
+        container.classList.remove('dashboard-mode');
+      }
+    }
+
     screens.forEach(function(scr) {
       if (scr.classList.contains('active')) {
         scr.classList.remove('active');
