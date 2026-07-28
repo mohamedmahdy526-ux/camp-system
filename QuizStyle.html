@@ -1,0 +1,441 @@
+<style>
+  /* ================= CSS VARIABLES & RESET ================= */
+  :root {
+    --bg-dark: #011312; /* Deep Brand Teal Black */
+    --card-bg: rgba(4, 34, 31, 0.75); /* Dark Teal Translucent */
+    --border: rgba(197, 160, 89, 0.25); /* Gold Translucent */
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #71717a;
+    
+    --primary: #c5a059; /* Brand Warm Gold */
+    --primary-hover: #e3c588; /* Brand Light Gold */
+    --accent: #053733; /* Deep Brand Teal */
+    --accent-hover: #0b4d47;
+    --success: #c5a059;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --info: #60a5fa;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Cairo', 'Outfit', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 50%, #063f3a 0%, #011312 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ================= GLOW EFFECTS ================= */
+  .glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .glow-1 {
+    top: -50px;
+    right: -50px;
+    background-color: var(--primary);
+  }
+  .glow-2 {
+    bottom: -50px;
+    left: -50px;
+    background-color: #0b4d47;
+  }
+
+  /* ================= APP CONTAINER ================= */
+  .app-container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ================= SCREENS & TRANSITIONS ================= */
+  .screen {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  .screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ================= BRANDING HEADER ================= */
+  .header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .brand-logo-container {
+    width: 65px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 28px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  }
+  .brand-logo-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .camp-title-styled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    direction: ltr;
+  }
+  .title-internship {
+    color: var(--text-primary);
+  }
+  .title-camp {
+    color: var(--primary);
+  }
+  .heartbeat-svg {
+    width: 32px;
+    height: 20px;
+  }
+  .heartbeat-svg path {
+    stroke: var(--primary) !important;
+  }
+  .camp-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .session-badge {
+    display: inline-block;
+    background: rgba(197, 160, 89, 0.15);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #f59e0b;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ================= FORM ELEMENTS ================= */
+  .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+    text-align: right;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* ================= BUTTONS ================= */
+  .btn {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #053733;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+  .btn-accent {
+    background: #0b4d47;
+    color: #ffffff;
+    border: 1px solid var(--primary);
+  }
+  .btn-accent:hover:not(:disabled) {
+    background: #115e57;
+    transform: translateY(-1px);
+  }
+
+  /* ================= QUIZ INTERFACE ================= */
+  .quiz-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .quiz-progress-container {
+    margin-bottom: 20px;
+  }
+  .quiz-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 6px;
+  }
+  .progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c5a059, #e3c588);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .question-card {
+    display: none;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    text-align: right;
+  }
+  .question-card.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .question-text {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    direction: rtl;
+  }
+  .option-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .option-item.selected {
+    background: rgba(197, 160, 89, 0.1);
+    border-color: var(--primary);
+  }
+  .option-radio {
+    margin-left: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+  .option-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  /* ================= RESULTS INTERFACE ================= */
+  .success-icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+  }
+  .result-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .score-circle-container {
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+  }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(197, 160, 89, 0.05);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.15);
+  }
+  .score-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+  .score-percent {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .result-badge {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 12px;
+    text-align: center;
+    margin: 15px 0;
+  }
+
+  /* ================= LOADING & SPINNER ================= */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.05);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .loading-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  /* ================= ALERTS ================= */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: right;
+    line-height: 1.5;
+  }
+  .alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
+  .alert-warning {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    color: #facc15;
+  }
+  .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+</style>

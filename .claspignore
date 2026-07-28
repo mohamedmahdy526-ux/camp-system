@@ -1,0 +1,21 @@
+# Ignore all files by default
+**/*
+
+# Except these specific Apps Script files
+!Code.gs
+!Config.gs
+!Database.gs
+!AttendanceService.gs
+!Index.html
+!Style.html
+!Script.html
+!QuizIndex.html
+!QuizStyle.html
+!QuizScript.html
+!AdminIndex.html
+!AdminStyle.html
+!AdminScript.html
+!FeedbackIndex.html
+!FeedbackStyle.html
+!FeedbackScript.html
+!appsscript.json

@@ -1,0 +1,455 @@
+<script>
+  // Admin State
+  var state = {
+    pin: "",
+    config: {},
+    stats: {},
+    logoUrl: ""
+  };
+
+  var sessionsGuideList = [
+    "التمهيد والترحيب (Opening & Orientation)",
+    "Session 1: Interview Skills, CV Writing & LinkedIn",
+    "Session 2: Professional Autonomy & Accountability",
+    "Session 3: ECG Interpretation",
+    "Session 4: Medication Safety & High Alert Medications",
+    "Session 5: ABG Interpretation & Patient Deterioration",
+    "Session 6: Trauma, Stroke & Acute Coronary Syndrome",
+    "Session 7: Care of Mechanically Ventilated Patients",
+    "Session 8: Panic Situations - Lines, Tubes & Drains",
+    "Session 9: Code Blue Management & Crash Cart",
+    "Session 10: Infection Prevention and Control (IPC)",
+    "Session 11: Quality Improvement & Patient Safety",
+    "Session 12: Soft Skills",
+    "Session 13: Communication Skills, SBAR & Documentation",
+    "Session 14: Career Development & Opportunities",
+    "المناقشة المفتوحة وحفل الختام (Closing Ceremony)"
+  ];
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return "S" + idx + ": " + sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initAdminApp();
+  });
+
+  var API_URL = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
+
+  function callServerOption(action, args, onSuccess, onFailure) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      var runner = google.script.run;
+      if (onSuccess) runner = runner.withSuccessHandler(onSuccess);
+      if (onFailure) runner = runner.withFailureHandler(onFailure);
+      runner[action].apply(runner, args);
+    } else {
+      // Hybrid mode - call Apps Script via HTTP fetch POST
+      fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({ action: action, args: args })
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data && data.error) {
+          if (onFailure) onFailure(new Error(data.error));
+        } else {
+          if (onSuccess) onSuccess(data);
+        }
+      })
+      .catch(function(err) {
+        if (onFailure) onFailure(err);
+      });
+    }
+  }
+
+  function initAdminApp() {
+    clearAlerts();
+    populateSessionDropdown();
+
+    // Load public settings first to show logo and name on login screen
+    showLoading("جاري تحميل إعدادات النظام...");
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(onPublicSettingsLoaded)
+        .withFailureHandler(function(err) {
+          hideLoading();
+          checkStoredPin();
+        })
+        .getSystemSettings();
+    } else {
+      // Local Mock Settings Load
+      setTimeout(function() {
+        onPublicSettingsLoaded({
+          CampName: "Nursing Internship Camp (Local Mock)",
+          LogoURL: "https://lh3.googleusercontent.com/d/167rdAQntynxuH3mRHZYa6eabz4qRiyYR"
+        });
+      }, 1000);
+    }
+  }
+
+  function onPublicSettingsLoaded(res) {
+    hideLoading();
+    if (res && !res.error) {
+      state.campName = res.CampName || "";
+      state.logoUrl = normalizeLogoUrl(res.LogoURL);
+
+      // Update UI with public branding
+      var subtitles = document.querySelectorAll('.dynamic-camp-subtitle');
+      subtitles.forEach(function(el) {
+        el.textContent = state.campName;
+      });
+
+      // Update Logos
+      var logos = document.querySelectorAll('.dynamic-logo-img');
+      logos.forEach(function(el) {
+        if (state.logoUrl) {
+          el.src = state.logoUrl;
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    checkStoredPin();
+  }
+
+  function checkStoredPin() {
+    var storedPin = sessionStorage.getItem("admin_pin");
+    if (storedPin) {
+      loadDashboardData(storedPin);
+    }
+  }
+
+  function populateSessionDropdown() {
+    var select = document.getElementById("select-admin-session");
+    var selectFeedback = document.getElementById("select-admin-feedback-session");
+    
+    if (select) {
+      select.innerHTML = "";
+      for (var i = 0; i < sessionsGuideList.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = i.toString();
+        opt.textContent = getSessionName(i);
+        select.appendChild(opt);
+      }
+    }
+    
+    if (selectFeedback) {
+      selectFeedback.innerHTML = "";
+      for (var i = 0; i < sessionsGuideList.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = i.toString();
+        opt.textContent = getSessionName(i);
+        selectFeedback.appendChild(opt);
+      }
+    }
+  }
+
+  function handleLoginSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    var pinInput = document.getElementById("input-admin-pin");
+    var pinVal = pinInput.value.trim();
+
+    if (!pinVal) {
+      showAlert("login-alert", "يرجى إدخال رمز التحقق.", "danger");
+      return;
+    }
+
+    showLoading("جاري التحقق من الصلاحيات الإدارية...");
+
+    callServerOption("verifyAdminPIN", [pinVal], function(res) {
+      if (res.error) {
+        hideLoading();
+        showAlert("login-alert", res.error, "danger");
+      } else {
+        sessionStorage.setItem("admin_pin", pinVal);
+        loadDashboardData(pinVal);
+      }
+    }, function(err) {
+      hideLoading();
+      showAlert("login-alert", "حدث خطأ أثناء الاتصال: " + err.message, "danger");
+    });
+  }
+
+  function loadDashboardData(pin) {
+    showLoading("جاري جلب إحصائيات وإعدادات النظام...");
+    state.pin = pin;
+
+    callServerOption("getAdminDashboardData", [pin], onDashboardDataLoaded, onDashboardError);
+  }
+
+  function onDashboardDataLoaded(res) {
+    hideLoading();
+    if (res.error) {
+      sessionStorage.removeItem("admin_pin");
+      showAlert("login-alert", res.error, "danger");
+      showScreen("screen-admin-login");
+      return;
+    }
+
+    state.config = res.settings;
+    state.stats = res.stats;
+    state.logoUrl = normalizeLogoUrl(res.settings.LogoURL);
+
+    // Update UI Stats
+    document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
+    document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
+    document.getElementById("stat-quiz-takers").textContent = res.stats.currentSessionQuizTakers;
+    document.getElementById("stat-quiz-avg").textContent = res.stats.averageQuizScore + " / 10";
+
+    // Update UI Form fields
+    document.getElementById("admin-camp-title").textContent = res.settings.CampName;
+    document.getElementById("select-admin-session").value = res.settings.CurrentSession;
+    if (document.getElementById("select-admin-feedback-session")) {
+      document.getElementById("select-admin-feedback-session").value = res.settings.FeedbackSession || res.settings.CurrentSession;
+    }
+    document.getElementById("toggle-attendance-status").checked = (res.settings.Attendance === "OPEN");
+    document.getElementById("toggle-quiz-status").checked = (res.settings.Quiz === "OPEN");
+    document.getElementById("toggle-feedback-status").checked = (res.settings.Feedback === "OPEN");
+    document.getElementById("input-admin-camp-name").value = res.settings.CampName || "";
+    document.getElementById("input-admin-min-attendance").value = res.settings.MinAttendance;
+    document.getElementById("input-admin-logo-url").value = res.settings.LogoURL || "";
+    document.getElementById("input-admin-facebook-url").value = res.settings.FacebookURL || "";
+    document.getElementById("input-admin-new-pin").value = "";
+
+    // Update Logos
+    var logos = document.querySelectorAll('.dynamic-logo-img');
+    logos.forEach(function(el) {
+      if (state.logoUrl) {
+        el.src = state.logoUrl;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    // Populate URLs
+    var baseUrl = window.location.href.split('?')[0];
+    // If running inside iframe, use standard base URL path, fallback to window.location
+    if (baseUrl.indexOf("userCodeAppPanel") !== -1) {
+      baseUrl = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
+    }
+    
+    document.getElementById("link-attendance-url").value = baseUrl;
+    document.getElementById("link-quiz-url").value = baseUrl + "?page=quiz";
+    document.getElementById("link-feedback-url").value = baseUrl + "?page=feedback";
+
+    showScreen("screen-admin-dashboard");
+  }
+
+  function onDashboardError(err) {
+    hideLoading();
+    sessionStorage.removeItem("admin_pin");
+    showAlert("login-alert", "فشل تحميل لوحة التحكم: " + err.message, "danger");
+    showScreen("screen-admin-login");
+  }
+
+  function normalizeLogoUrl(url) {
+    if (!url) return "";
+    var drivePattern = /drive\.google\.com\/file\/d\/([^\/]+)/;
+    var match = url.match(drivePattern);
+    if (match && match[1]) {
+      return "https://lh3.googleusercontent.com/d/" + match[1];
+    }
+    return url;
+  }
+
+  function saveDashboardSettings() {
+    clearAlerts();
+    var sessionVal = document.getElementById("select-admin-session").value;
+    var feedbackSessionVal = document.getElementById("select-admin-feedback-session").value;
+    var attendanceOpen = document.getElementById("toggle-attendance-status").checked ? "OPEN" : "CLOSED";
+    var quizOpen = document.getElementById("toggle-quiz-status").checked ? "OPEN" : "CLOSED";
+    var feedbackOpen = document.getElementById("toggle-feedback-status").checked ? "OPEN" : "CLOSED";
+    var campNameVal = document.getElementById("input-admin-camp-name").value.trim();
+    var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
+    var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
+    var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
+    var newPinVal = document.getElementById("input-admin-new-pin").value.trim();
+
+    if (!campNameVal) {
+      showAlert("dashboard-alert", "يرجى كتابة اسم الكامب التدريبي.", "danger");
+      return;
+    }
+
+    if (isNaN(minAttendance) || minAttendance < 1 || minAttendance > 16) {
+      showAlert("dashboard-alert", "يرجى كتابة عدد صحيح مقبول للحد الأدنى من المحاضرات (بين 1 و 16).", "danger");
+      return;
+    }
+
+    showLoading("جاري حفظ التغييرات وتعميمها...");
+
+    var updates = {
+      CurrentSession: sessionVal,
+      FeedbackSession: feedbackSessionVal,
+      Attendance: attendanceOpen,
+      Quiz: quizOpen,
+      Feedback: feedbackOpen,
+      CampName: campNameVal,
+      MinAttendance: minAttendance,
+      LogoURL: logoUrlVal,
+      FacebookURL: facebookUrlVal
+    };
+
+    if (newPinVal !== "") {
+      updates.AdminPIN = newPinVal;
+    }
+
+    callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
+      if (newPinVal !== "") {
+        state.pin = newPinVal;
+        sessionStorage.setItem("admin_pin", newPinVal);
+      }
+      onDashboardDataLoaded(res);
+      showAlert("dashboard-alert", "تم حفظ الإعدادات وتحديث الجداول بنجاح سحابياً! 🚀", "success");
+    }, function(err) {
+      hideLoading();
+      showAlert("dashboard-alert", "فشل حفظ الإعدادات: " + err.message, "danger");
+    });
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem("admin_pin");
+    state.pin = "";
+    document.getElementById("input-admin-pin").value = "";
+    showScreen("screen-admin-login");
+  }
+
+  function copyToClipboard(elementId) {
+    var copyText = document.getElementById(elementId);
+    if (!copyText) return;
+
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+      navigator.clipboard.writeText(copyText.value);
+      alert("تم نسخ النص إلى الحافظة بنجاح! 📋");
+    } catch (err) {
+      // Fallback
+      document.execCommand("copy");
+      alert("تم نسخ النص إلى الحافظة! 📋");
+    }
+  }
+
+  function generateAnnouncement(type) {
+    var sessionName = getSessionName(state.config.CurrentSession);
+    var feedbackSessionName = getSessionName(state.config.FeedbackSession || state.config.CurrentSession);
+    var attendanceUrl = document.getElementById("link-attendance-url").value;
+    var quizUrl = document.getElementById("link-quiz-url").value;
+    var feedbackUrl = document.getElementById("link-feedback-url").value;
+    var text = "";
+
+    if (type === "attendance") {
+      text = 
+        "📢 *إعلان هام: بدء تسجيل حضور المحاضرة الحالية!* 📣\n\n" +
+        "أهلاً بكم يا زملاء، تم فتح باب تسجيل حضور محاضرة اليوم:\n" +
+        "📚 *" + sessionName + "*\n\n" +
+        "الرجاء تسجيل حضوركم فوراً عبر رابط الحضور الرسمي التالي:\n" +
+        "🔗 " + attendanceUrl + "\n\n" +
+        "*ملاحظة:* يرجى التأكد من كتابة الاسم ورقم الهاتف بشكل مطابق للتسجيل الأول. بالتوفيق لكم جميعاً! 🌸✨";
+    } else if (type === "quiz") {
+      text = 
+        "🧠 *إعلان هام: انطلاق كويز المحاضرة التفاعلي!* 📝\n\n" +
+        "زملاءنا الأعزاء، تم تفعيل الكويز التقييمي التفاعلي المخصص لمحاضرة اليوم:\n" +
+        "🎓 *" + sessionName + "*\n\n" +
+        "الرجاء الدخول وتقديم إجاباتكم لقياس مدى الاستيعاب وتوثيق درجاتكم عبر الرابط التالي:\n" +
+        "🔗 " + quizUrl + "\n\n" +
+        "*ملاحظة:* كويز المحاضرة متاح للإجراء لمرة واحدة فقط لكل طالب مسجل. بالتوفيق للجميع! 🏆🎯";
+    } else if (type === "feedback") {
+      text = 
+        "💖 *إعلان هام: استطلاع الرأي وتقييم المحاضرة!* 📝\n\n" +
+        "زملاءنا الأعزاء، نرجو منكم التكرم بمشاركتنا تقييمكم ورأيكم الصادق حول محاضرة اليوم:\n" +
+        "🎓 *" + feedbackSessionName + "*\n\n" +
+        "مشاركتكم تساهم بشكل أساسي في تطوير المحاضرات القادمة. يرجى ملء الاستبيان عبر الرابط:\n" +
+        "🔗 " + feedbackUrl + "\n\n" +
+        "شكراً جزيلاً لتعاونكم ودعمكم المستمر! 🌟✨";
+    }
+
+    document.getElementById("announcement-text").value = text;
+    openModal();
+  }
+
+  function openModal() {
+    document.getElementById("announcement-modal").classList.add("active");
+  }
+
+  function closeModal() {
+    document.getElementById("announcement-modal").classList.remove("active");
+  }
+
+  function showScreen(screenId) {
+    var screens = document.querySelectorAll('.screen');
+    var targetScreen = document.getElementById(screenId);
+
+    if (!targetScreen) return;
+
+    screens.forEach(function(scr) {
+      if (scr.classList.contains('active')) {
+        scr.classList.remove('active');
+        scr.style.display = 'none';
+      }
+    });
+
+    targetScreen.style.display = 'block';
+    void targetScreen.offsetWidth; // Force reflow
+    targetScreen.classList.add('active');
+  }
+
+  function showLoading(text) {
+    var overlay = document.getElementById('loading-overlay');
+    var overlayText = document.getElementById('loading-text');
+    if (overlay) {
+      overlayText.textContent = text || "جاري التحميل...";
+      overlay.classList.add('active');
+    }
+  }
+
+  function hideLoading() {
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  }
+
+  function showAlert(containerId, message, type) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    var alertClass = 'alert-success';
+    var icon = '✅';
+
+    if (type === 'danger') {
+      alertClass = 'alert-danger';
+      icon = '⚠️';
+    }
+
+    container.innerHTML = 
+      '<div class="alert ' + alertClass + '">' +
+        '<span>' + icon + '</span>' +
+        '<div>' + message + '</div>' +
+      '</div>';
+  }
+
+  function clearAlerts() {
+    var containers = ['login-alert', 'dashboard-alert'];
+    containers.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+  }
+</script>

@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>نظام الاختبارات - مبادرة ما ينفع الناس</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Styles -->
+    <style>
+  /* ================= CSS VARIABLES & RESET ================= */
+  :root {
+    --bg-dark: #011312; /* Deep Brand Teal Black */
+    --card-bg: rgba(4, 34, 31, 0.75); /* Dark Teal Translucent */
+    --border: rgba(197, 160, 89, 0.25); /* Gold Translucent */
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #71717a;
+    
+    --primary: #c5a059; /* Brand Warm Gold */
+    --primary-hover: #e3c588; /* Brand Light Gold */
+    --accent: #053733; /* Deep Brand Teal */
+    --accent-hover: #0b4d47;
+    --success: #c5a059;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --info: #60a5fa;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Cairo', 'Outfit', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 50%, #063f3a 0%, #011312 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ================= GLOW EFFECTS ================= */
+  .glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .glow-1 {
+    top: -50px;
+    right: -50px;
+    background-color: var(--primary);
+  }
+  .glow-2 {
+    bottom: -50px;
+    left: -50px;
+    background-color: #0b4d47;
+  }
+
+  /* ================= APP CONTAINER ================= */
+  .app-container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ================= SCREENS & TRANSITIONS ================= */
+  .screen {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  .screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ================= BRANDING HEADER ================= */
+  .header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .brand-logo-container {
+    width: 65px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 28px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  }
+  .brand-logo-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .camp-title-styled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    direction: ltr;
+  }
+  .title-internship {
+    color: var(--text-primary);
+  }
+  .title-camp {
+    color: var(--primary);
+  }
+  .heartbeat-svg {
+    width: 32px;
+    height: 20px;
+  }
+  .heartbeat-svg path {
+    stroke: var(--primary) !important;
+  }
+  .camp-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .session-badge {
+    display: inline-block;
+    background: rgba(197, 160, 89, 0.15);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #f59e0b;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ================= FORM ELEMENTS ================= */
+  .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+    text-align: right;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* ================= BUTTONS ================= */
+  .btn {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #053733;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+  .btn-accent {
+    background: #0b4d47;
+    color: #ffffff;
+    border: 1px solid var(--primary);
+  }
+  .btn-accent:hover:not(:disabled) {
+    background: #115e57;
+    transform: translateY(-1px);
+  }
+
+  /* ================= QUIZ INTERFACE ================= */
+  .quiz-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .quiz-progress-container {
+    margin-bottom: 20px;
+  }
+  .quiz-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 6px;
+  }
+  .progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c5a059, #e3c588);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .question-card {
+    display: none;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    text-align: right;
+  }
+  .question-card.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .question-text {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    direction: rtl;
+  }
+  .option-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .option-item.selected {
+    background: rgba(197, 160, 89, 0.1);
+    border-color: var(--primary);
+  }
+  .option-radio {
+    margin-left: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+  .option-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  /* ================= RESULTS INTERFACE ================= */
+  .success-icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+  }
+  .result-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .score-circle-container {
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+  }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(197, 160, 89, 0.05);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.15);
+  }
+  .score-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+  .score-percent {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .result-badge {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 12px;
+    text-align: center;
+    margin: 15px 0;
+  }
+
+  /* ================= LOADING & SPINNER ================= */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.05);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .loading-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  /* ================= ALERTS ================= */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: right;
+    line-height: 1.5;
+  }
+  .alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
+  .alert-warning {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    color: #facc15;
+  }
+  .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+</style>
+
+  </head>
+  <body>
+    <!-- Background Effects -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="app-container">
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner spinner-dark"></div>
+        <div id="loading-text" class="loading-text">جاري تحميل الاختبار...</div>
+      </div>
+
+      <!-- ================= SCREEN: PHONE CHECK ================= -->
+      <div id="screen-quiz-auth" class="screen active">
+        <div class="header">
+          <div class="brand-logo-container">
+            <span class="brand-logo-text-fallback">🤝</span>
+            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.style.display='none'" alt="Logo">
+          </div>
+          <h1 class="camp-title-styled">
+            <svg class="heartbeat-svg heartbeat-left" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="title-internship">INTERNSHIP</span>
+            <span class="title-camp">CAMP</span>
+            <svg class="heartbeat-svg heartbeat-right" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </h1>
+          <div class="camp-subtitle dynamic-camp-subtitle">مبادرة ما ينفع الناس</div>
+          <span class="session-badge dynamic-session-badge">كويز المحاضرة...</span>
+        </div>
+        
+        <div id="auth-alert"></div>
+
+        <form id="form-quiz-auth" onsubmit="handleAuthSubmit(event)">
+          <div class="form-group">
+            <label for="input-quiz-phone" class="form-label">أدخل رقم الموبايل المسجل لبدء الكويز:</label>
+            <input type="text" id="input-quiz-phone" class="form-input" placeholder="مثال: 01012345678" required inputmode="tel">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            التحقق والدخول للاختبار
+          </button>
+        </form>
+
+        <!-- Social Footer -->
+        <div class="social-footer" style="margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: bold;">مبادرة ما ينفع الناس على فيسبوك:</div>
+          <div style="display: flex; justify-content: center;">
+            <a href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank" class="social-link facebook-link facebook-link-href" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #1877f2; text-decoration: none; font-weight: bold; background: rgba(24, 119, 242, 0.1); padding: 8px 16px; border-radius: 20px; transition: 0.2s; border: 1px solid rgba(24, 119, 242, 0.2)">
+              <span>🔵</span> فيسبوك (Facebook)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCREEN: ACTIVE QUIZ QUESTIONS ================= -->
+      <div id="screen-quiz-questions" class="screen">
+        <div class="header">
+          <h2 class="quiz-title" id="quiz-current-session-title">كويز المحاضرة التفاعلي</h2>
+          <div class="quiz-progress-container">
+            <div class="quiz-progress-text">سؤال <span id="current-q-index">1</span> من <span id="total-q-count">5</span></div>
+            <div class="progress-bar-bg">
+              <div id="quiz-progress-fill" class="progress-bar-fill" style="width: 20%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="quiz-alert"></div>
+
+        <form id="form-quiz-questions" onsubmit="handleQuizSubmit(event)">
+          <div id="quiz-container">
+            <!-- Dynamic Question Cards will be injected here by JS -->
+          </div>
+
+          <div style="display: flex; justify-content: space-between; gap: 15px; margin-top: 20px;">
+            <button type="button" id="btn-quiz-prev" class="btn btn-secondary" onclick="navigateQuestion(-1)" style="flex: 1;">السابق</button>
+            <button type="button" id="btn-quiz-next" class="btn btn-primary" onclick="navigateQuestion(1)" style="flex: 1;">التالي</button>
+          </div>
+
+          <button type="submit" id="btn-quiz-submit" class="btn btn-accent" style="width: 100%; margin-top: 15px; display: none;">إرسال الإجابات وإنهاء الاختبار 🏁</button>
+        </form>
+      </div>
+
+      <!-- ================= SCREEN: QUIZ SCORE RESULT ================= -->
+      <div id="screen-quiz-result" class="screen">
+        <div class="header">
+          <div class="success-icon">🎉</div>
+          <h2 class="result-title">تم إنهاء الكويز بنجاح!</h2>
+          <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;" id="result-student-name">طالب مسجل</span>
+        </div>
+
+        <div class="score-circle-container">
+          <div class="score-circle">
+            <span class="score-val" id="result-score-val">8/10</span>
+            <span class="score-percent" id="result-percent-val">80%</span>
+          </div>
+        </div>
+
+        <div id="result-feedback-badge" class="result-badge">ممتاز! لقد اجتزت الكويز بنجاح باهر.</div>
+
+        <div style="margin-top: 25px; text-align: center;">
+          <a href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank" class="btn btn-primary facebook-link-href" style="display: inline-block; width: 100%; text-decoration: none;">متابعة صفحة المبادرة على فيسبوك</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script>
+  // App State
+  var state = {
+    phone: "",
+    studentName: "",
+    session: "",
+    campName: "",
+    logoUrl: "",
+    questions: [],
+    currentQIndex: 0,
+    answers: {} // Map of questionId -> selectedOption
+  };
+
+  var API_URL = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
+
+  function callServerOption(action, args, onSuccess, onFailure) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      var runner = google.script.run;
+      if (onSuccess) runner = runner.withSuccessHandler(onSuccess);
+      if (onFailure) runner = runner.withFailureHandler(onFailure);
+      runner[action].apply(runner, args);
+    } else {
+      // Hybrid mode - call Apps Script via HTTP fetch POST
+      fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({ action: action, args: args })
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data && data.error) {
+          if (onFailure) onFailure(new Error(data.error));
+        } else {
+          if (onSuccess) onSuccess(data);
+        }
+      })
+      .catch(function(err) {
+        if (onFailure) onFailure(err);
+      });
+    }
+  }
+
+  var sessionsGuideList = [
+    "التمهيد والترحيب (Opening & Orientation)",
+    "Session 1: Interview Skills, CV Writing & LinkedIn",
+    "Session 2: Professional Autonomy & Accountability",
+    "Session 3: ECG Interpretation",
+    "Session 4: Medication Safety & High Alert Medications",
+    "Session 5: ABG Interpretation & Patient Deterioration",
+    "Session 6: Trauma, Stroke & Acute Coronary Syndrome",
+    "Session 7: Care of Mechanically Ventilated Patients",
+    "Session 8: Panic Situations - Lines, Tubes & Drains",
+    "Session 9: Code Blue Management & Crash Cart",
+    "Session 10: Infection Prevention and Control (IPC)",
+    "Session 11: Quality Improvement & Patient Safety",
+    "Session 12: Soft Skills",
+    "Session 13: Communication Skills, SBAR & Documentation",
+    "Session 14: Career Development & Opportunities",
+    "المناقشة المفتوحة وحفل الختام (Closing Ceremony)"
+  ];
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+  });
+
+  function initApp() {
+    showLoading("جاري تحميل إعدادات النظام...");
+    clearAlerts();
+
+    callServerOption("getSystemSettings", [], onSettingsLoaded, onSettingsError);
+  }
+
+  function onSettingsLoaded(settings) {
+    hideLoading();
+    if (settings.error) {
+      showGlobalError(settings.error);
+      return;
+    }
+
+    state.campName = settings.CampName || "Camp";
+    state.session = settings.CurrentSession || "0";
+    state.logoUrl = normalizeLogoUrl(settings.LogoURL);
+
+    // Update Facebook Links
+    var fbUrls = document.querySelectorAll('.facebook-link-href');
+    fbUrls.forEach(function(el) {
+      el.href = settings.FacebookURL || "https://www.facebook.com/profile.php?id=61575638669904";
+    });
+
+    // Update branding text
+    updateBranding();
+  }
+
+  function onSettingsError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل تحميل إعدادات النظام: " + err.message, "danger");
+  }
+
+  function normalizeLogoUrl(url) {
+    if (!url) return "";
+    var drivePattern = /drive\.google\.com\/file\/d\/([^\/]+)/;
+    var match = url.match(drivePattern);
+    if (match && match[1]) {
+      return "https://lh3.googleusercontent.com/d/" + match[1];
+    }
+    return url;
+  }
+
+  function updateBranding() {
+    var subtitles = document.querySelectorAll('.dynamic-camp-subtitle');
+    subtitles.forEach(function(el) {
+      el.textContent = state.campName;
+    });
+
+    var badges = document.querySelectorAll('.dynamic-session-badge');
+    badges.forEach(function(el) {
+      el.textContent = "كويز: " + getSessionName(state.session);
+    });
+
+    var logos = document.querySelectorAll('.dynamic-logo-img');
+    logos.forEach(function(el) {
+      if (state.logoUrl) {
+        el.src = state.logoUrl;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function handleAuthSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    var phoneInput = document.getElementById('input-quiz-phone');
+    var rawPhone = phoneInput.value.trim();
+
+    if (!rawPhone || rawPhone.replace(/[^\d]/g, "").length < 8) {
+      showAlert("auth-alert", "يرجى إدخال رقم هاتف صحيح.", "danger");
+      return;
+    }
+
+    showLoading("جاري التحقق من رقم الهاتف...");
+    state.phone = rawPhone;
+
+    callServerOption("checkQuizStatus", [rawPhone], onQuizStatusLoaded, onAuthError);
+  }
+
+  function onQuizStatusLoaded(res) {
+    if (res.status === "CLOSED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "warning");
+      return;
+    }
+
+    if (res.status === "NOT_REGISTERED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    if (res.status === "NO_QUESTIONS") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "warning");
+      return;
+    }
+
+    if (res.status === "INVALID_PHONE") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    state.studentName = res.studentName;
+
+    if (res.status === "ALREADY_TAKEN") {
+      hideLoading();
+      // Show results screen directly
+      showResultsScreen(res.score, res.total, res.percentage);
+      return;
+    }
+
+    // Status is READY, load questions
+    showLoading("جاري تحميل أسئلة الاختبار...");
+    callServerOption("getQuizQuestionsForSession", [state.phone], onQuestionsLoaded, onAuthError);
+  }
+
+  function onQuestionsLoaded(res) {
+    hideLoading();
+    state.questions = res.questions;
+    state.currentQIndex = 0;
+    state.answers = {};
+
+    // Render questions
+    renderQuestions();
+    
+    // Switch Screen
+    showScreen("screen-quiz-questions");
+  }
+
+  function onAuthError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل عملية التحقق: " + err.message, "danger");
+  }
+
+  function renderQuestions() {
+    var container = document.getElementById("quiz-container");
+    container.innerHTML = "";
+
+    document.getElementById("total-q-count").textContent = state.questions.length;
+    document.getElementById("quiz-current-session-title").textContent = "كويز: " + getSessionName(state.session);
+
+    for (var i = 0; i < state.questions.length; i++) {
+      var q = state.questions[i];
+      var card = document.createElement("div");
+      card.className = "question-card" + (i === 0 ? " active" : "");
+      card.id = "q-card-" + i;
+
+      var qText = document.createElement("div");
+      qText.className = "question-text";
+      qText.innerHTML = "<strong>سؤال " + (i + 1) + ":</strong> " + q.questionText;
+      card.appendChild(qText);
+
+      var optionsList = document.createElement("div");
+      optionsList.className = "options-list";
+
+      // Render Options
+      var options = [
+        { key: "A", val: q.optionA },
+        { key: "B", val: q.optionB }
+      ];
+      if (q.type === "MCQ") {
+        if (q.optionC) options.push({ key: "C", val: q.optionC });
+        if (q.optionD) options.push({ key: "D", val: q.optionD });
+      }
+
+      for (var j = 0; j < options.length; j++) {
+        var opt = options[j];
+        if (!opt.val) continue;
+
+        var optItem = document.createElement("div");
+        optItem.className = "option-item";
+        optItem.setAttribute("data-q-index", i);
+        optItem.setAttribute("data-option-key", opt.key);
+        optItem.setAttribute("onclick", "selectOption(" + i + ", '" + q.questionId + "', '" + opt.key + "')");
+        optItem.id = "opt-" + i + "-" + opt.key;
+
+        var radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "radio-q-" + i;
+        radio.className = "option-radio";
+        radio.value = opt.key;
+        optItem.appendChild(radio);
+
+        var label = document.createElement("span");
+        label.className = "option-label";
+        label.textContent = opt.val;
+        optItem.appendChild(label);
+
+        optionsList.appendChild(optItem);
+      }
+
+      card.appendChild(optionsList);
+      container.appendChild(card);
+    }
+
+    updateNavigation();
+  }
+
+  function selectOption(qIdx, qId, optKey) {
+    // Unselect others in the same question card
+    var siblingOptions = document.querySelectorAll("#q-card-" + qIdx + " .option-item");
+    siblingOptions.forEach(function(el) {
+      el.classList.remove("selected");
+      var radio = el.querySelector(".option-radio");
+      if (radio) radio.checked = false;
+    });
+
+    // Select this option
+    var selectedDiv = document.getElementById("opt-" + qIdx + "-" + optKey);
+    if (selectedDiv) {
+      selectedDiv.classList.add("selected");
+      var radio = selectedDiv.querySelector(".option-radio");
+      if (radio) radio.checked = true;
+    }
+
+    // Save answer
+    state.answers[qId] = optKey;
+  }
+
+  function navigateQuestion(direction) {
+    var newIdx = state.currentQIndex + direction;
+    if (newIdx < 0 || newIdx >= state.questions.length) return;
+
+    // Hide current question
+    document.getElementById("q-card-" + state.currentQIndex).classList.remove("active");
+    
+    state.currentQIndex = newIdx;
+    
+    // Show new question
+    document.getElementById("q-card-" + state.currentQIndex).classList.add("active");
+
+    updateNavigation();
+  }
+
+  function updateNavigation() {
+    document.getElementById("current-q-index").textContent = state.currentQIndex + 1;
+    
+    // Update progress bar
+    var progressPct = ((state.currentQIndex + 1) / state.questions.length) * 100;
+    document.getElementById("quiz-progress-fill").style.width = progressPct + "%";
+
+    // Show / hide buttons
+    var btnPrev = document.getElementById("btn-quiz-prev");
+    var btnNext = document.getElementById("btn-quiz-next");
+    var btnSubmit = document.getElementById("btn-quiz-submit");
+
+    btnPrev.disabled = (state.currentQIndex === 0);
+    
+    if (state.currentQIndex === state.questions.length - 1) {
+      btnNext.style.display = "none";
+      btnSubmit.style.display = "block";
+    } else {
+      btnNext.style.display = "block";
+      btnSubmit.style.display = "none";
+    }
+  }
+
+  function handleQuizSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    // Check if all questions are answered
+    var unanswered = [];
+    for (var i = 0; i < state.questions.length; i++) {
+      var qId = state.questions[i].questionId;
+      if (!state.answers.hasOwnProperty(qId)) {
+        unanswered.push(i + 1);
+      }
+    }
+
+    if (unanswered.length > 0) {
+      showAlert("quiz-alert", "يرجى الإجابة على جميع الأسئلة قبل الإرسال. الأسئلة المتبقية: " + unanswered.join(", "), "warning");
+      return;
+    }
+
+    // Format payload
+    var payload = state.questions.map(function(q) {
+      return {
+        questionId: q.questionId,
+        selectedOption: state.answers[q.questionId]
+      };
+    });
+
+    showLoading("جاري تصحيح إجاباتك وتسجيل النتيجة...");
+
+    callServerOption("submitQuizAnswers", [state.phone, payload], onQuizSubmitted, onQuizSubmitError);
+  }
+
+  function onQuizSubmitted(res) {
+    hideLoading();
+    if (res.error) {
+      showAlert("quiz-alert", res.error, "danger");
+      return;
+    }
+
+    showResultsScreen(res.score, res.total, res.percentage);
+  }
+
+  function onQuizSubmitError(err) {
+    hideLoading();
+    showAlert("quiz-alert", "فشل إرسال إجاباتك: " + err.message, "danger");
+  }
+
+  function showResultsScreen(score, total, percentage) {
+    document.getElementById("result-student-name").textContent = state.studentName;
+    document.getElementById("result-score-val").textContent = score + " / " + total;
+    
+    var percentStr = Math.round(percentage * 100) + "%";
+    document.getElementById("result-percent-val").textContent = percentStr;
+
+    // Feedback message
+    var feedbackEl = document.getElementById("result-feedback-badge");
+    feedbackEl.className = "result-badge"; // Reset
+
+    if (percentage >= 0.85) {
+      feedbackEl.style.background = "rgba(16, 185, 129, 0.1)";
+      feedbackEl.style.color = "#34d399";
+      feedbackEl.style.borderColor = "rgba(16, 185, 129, 0.2)";
+      feedbackEl.textContent = "ممتاز! لقد اجتزت الكويز بنجاح باهر وتفوق. 🌟🏆";
+    } else if (percentage >= 0.6) {
+      feedbackEl.style.background = "rgba(59, 130, 246, 0.1)";
+      feedbackEl.style.color = "#60a5fa";
+      feedbackEl.style.borderColor = "rgba(59, 130, 246, 0.2)";
+      feedbackEl.textContent = "أداء جيد! لقد اجتزت الكويز بنجاح. استمر في التميز. 👍";
+    } else {
+      feedbackEl.style.background = "rgba(239, 68, 68, 0.1)";
+      feedbackEl.style.color = "#f87171";
+      feedbackEl.style.borderColor = "rgba(239, 68, 68, 0.2)";
+      feedbackEl.textContent = "حظاً أوفر! نتيجة الاختبار لم تتجاوز حد النجاح المطلوبة. حاول التركيز أكثر في المحاضرة القادمة. 📝";
+    }
+
+    showScreen("screen-quiz-result");
+  }
+
+  function showScreen(screenId) {
+    var screens = document.querySelectorAll('.screen');
+    var targetScreen = document.getElementById(screenId);
+
+    if (!targetScreen) return;
+
+    screens.forEach(function(scr) {
+      if (scr.classList.contains('active')) {
+        scr.classList.remove('active');
+        scr.style.display = 'none';
+      }
+    });
+
+    targetScreen.style.display = 'block';
+    void targetScreen.offsetWidth; // Force reflow
+    targetScreen.classList.add('active');
+  }
+
+  function showLoading(text) {
+    var overlay = document.getElementById('loading-overlay');
+    var overlayText = document.getElementById('loading-text');
+    if (overlay) {
+      overlayText.textContent = text || "جاري التحميل...";
+      overlay.classList.add('active');
+    }
+  }
+
+  function hideLoading() {
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  }
+
+  function showAlert(containerId, message, type) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    var alertClass = 'alert-info';
+    var icon = 'ℹ️';
+
+    if (type === 'danger') {
+      alertClass = 'alert-danger';
+      icon = '⚠️';
+    } else if (type === 'warning') {
+      alertClass = 'alert-warning';
+      icon = '🔔';
+    }
+
+    container.innerHTML = 
+      '<div class="alert ' + alertClass + '">' +
+        '<span>' + icon + '</span>' +
+        '<div>' + message + '</div>' +
+      '</div>';
+  }
+
+  function clearAlerts() {
+    var containers = ['auth-alert', 'quiz-alert'];
+    containers.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+  }
+
+  function showGlobalError(msg) {
+    showAlert('auth-alert', msg, 'danger');
+  }
+</script>
+
+  </body>
+</html>

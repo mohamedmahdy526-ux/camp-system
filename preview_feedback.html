@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>استطلاع الرأي والتقييم - مبادرة ما ينفع الناس</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Styles -->
+    <style>
+  /* ================= CSS VARIABLES & RESET ================= */
+  :root {
+    --bg-dark: #011312; /* Deep Brand Teal Black */
+    --card-bg: rgba(4, 34, 31, 0.75); /* Dark Teal Translucent */
+    --border: rgba(197, 160, 89, 0.25); /* Gold Translucent */
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #71717a;
+    
+    --primary: #c5a059; /* Brand Warm Gold */
+    --primary-hover: #e3c588; /* Brand Light Gold */
+    --accent: #053733; /* Deep Brand Teal */
+    --accent-hover: #0b4d47;
+    --success: #c5a059;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --info: #60a5fa;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Cairo', 'Outfit', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 50%, #063f3a 0%, #011312 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ================= GLOW EFFECTS ================= */
+  .glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .glow-1 {
+    top: -50px;
+    right: -50px;
+    background-color: var(--primary);
+  }
+  .glow-2 {
+    bottom: -50px;
+    left: -50px;
+    background-color: #0b4d47;
+  }
+
+  /* ================= APP CONTAINER ================= */
+  .app-container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ================= SCREENS & TRANSITIONS ================= */
+  .screen {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  .screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ================= BRANDING HEADER ================= */
+  .header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .brand-logo-container {
+    width: 65px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 28px;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  }
+  .brand-logo-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .camp-title-styled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    direction: ltr;
+  }
+  .title-internship {
+    color: var(--text-primary);
+  }
+  .title-camp {
+    color: var(--primary);
+  }
+  .heartbeat-svg {
+    width: 32px;
+    height: 20px;
+  }
+  .heartbeat-svg path {
+    stroke: var(--primary) !important;
+  }
+  .camp-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .session-badge {
+    display: inline-block;
+    background: rgba(197, 160, 89, 0.15);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #f59e0b;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ================= FORM ELEMENTS ================= */
+  .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+    text-align: right;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* ================= BUTTONS ================= */
+  .btn {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #053733;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+  .btn-accent {
+    background: #0b4d47;
+    color: #ffffff;
+    border: 1px solid var(--primary);
+  }
+  .btn-accent:hover:not(:disabled) {
+    background: #115e57;
+    transform: translateY(-1px);
+  }
+
+  /* ================= FEEDBACK QUESTIONS INTERFACE ================= */
+  .feedback-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .feedback-progress-container {
+    margin-bottom: 20px;
+  }
+  .feedback-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 6px;
+  }
+  .progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .question-card {
+    display: none;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    text-align: right;
+  }
+  .question-card.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .question-text {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+  }
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    direction: rtl;
+  }
+  .option-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .option-item.selected {
+    background: rgba(197, 160, 89, 0.1);
+    border-color: var(--primary);
+  }
+  .option-radio {
+    margin-left: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+  .option-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  /* ================= STAR RATING ================= */
+  .rating-range-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    padding: 24px 16px;
+    border-radius: 16px;
+    margin-top: 10px;
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .star-rating-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+    direction: ltr; /* Render 1 to 5 left-to-right */
+  }
+  .star-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+  }
+  .star-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+  }
+  .star-btn.active {
+    background: var(--primary);
+    color: #053733;
+    border-color: var(--primary);
+    box-shadow: 0 0 12px rgba(197, 160, 89, 0.4);
+  }
+  .star-btn.np-btn.active {
+    background: var(--primary);
+    color: #053733;
+    border-color: var(--primary);
+    box-shadow: 0 0 12px rgba(197, 160, 89, 0.4);
+  }
+
+  /* ================= RESULTS INTERFACE ================= */
+  .success-icon {
+    font-size: 45px;
+    margin-bottom: 12px;
+  }
+  .result-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  /* ================= LOADING & SPINNER ================= */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.05);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .loading-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  /* ================= ALERTS ================= */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: right;
+    line-height: 1.5;
+  }
+  .alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
+  .alert-warning {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    color: #facc15;
+  }
+  .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+</style>
+
+  </head>
+  <body>
+    <!-- Background Effects -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="app-container">
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner spinner-dark"></div>
+        <div id="loading-text" class="loading-text">جاري تحميل استطلاع الرأي...</div>
+      </div>
+
+      <!-- ================= SCREEN: PHONE CHECK ================= -->
+      <div id="screen-feedback-auth" class="screen active">
+        <div class="header">
+          <div class="brand-logo-container">
+            <span class="brand-logo-text-fallback">📝</span>
+            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.style.display='none'" alt="Logo">
+          </div>
+          <h1 class="camp-title-styled">
+            <svg class="heartbeat-svg heartbeat-left" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="title-internship">INTERNSHIP</span>
+            <span class="title-camp">CAMP</span>
+            <svg class="heartbeat-svg heartbeat-right" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </h1>
+          <div class="camp-subtitle dynamic-camp-subtitle">مبادرة ما ينفع الناس</div>
+          <span class="session-badge dynamic-session-badge">تقييم المحاضرة...</span>
+        </div>
+        
+        <div id="auth-alert"></div>
+
+        <form id="form-feedback-auth" onsubmit="handleAuthSubmit(event)">
+          <div class="form-group">
+            <label for="input-feedback-phone" class="form-label">أدخل رقم الموبايل المسجل للتقييم:</label>
+            <input type="text" id="input-feedback-phone" class="form-input" placeholder="مثال: 01012345678" required inputmode="tel">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            التحقق وبدء التقييم
+          </button>
+        </form>
+
+        <!-- Social Footer -->
+        <div class="social-footer" style="margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: bold;">صفحة مبادرة ما ينفع الناس الرسمية:</div>
+          <div style="display: flex; justify-content: center;">
+            <a href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank" class="social-link facebook-link facebook-link-href" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #1877f2; text-decoration: none; font-weight: bold; background: rgba(24, 119, 242, 0.1); padding: 8px 16px; border-radius: 20px; transition: 0.2s; border: 1px solid rgba(24, 119, 242, 0.2)">
+              <span>🔵</span> فيسبوك (Facebook)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCREEN: FEEDBACK FORM ================= -->
+      <div id="screen-feedback-questions" class="screen">
+        <div class="header">
+          <h2 class="feedback-title" id="feedback-current-session-title">تقييم المحاضرة</h2>
+          <div class="feedback-progress-container">
+            <div class="feedback-progress-text">سؤال <span id="current-q-index">1</span> من 7</div>
+            <div class="progress-bar-bg">
+              <div id="feedback-progress-fill" class="progress-bar-fill" style="width: 14.3%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="feedback-alert"></div>
+
+        <form id="form-feedback-questions" onsubmit="handleFeedbackSubmit(event)">
+          <div id="feedback-container">
+            
+            <!-- Q1: Satisfaction -->
+            <div class="question-card active" id="q-card-0">
+              <div class="question-text"><strong>سؤال 1:</strong> ما مدى رضاك عن المعلومات التي اكتسبتها من المحاضرة؟</div>
+              <div class="options-list">
+                <div class="option-item" onclick="selectFeedbackOption(0, 'q1', 'راضٍ جدًا', 'opt-0-1')" id="opt-0-1">
+                  <input type="radio" name="feedback-q1" class="option-radio" value="راضٍ جدًا">
+                  <span class="option-label">راضٍ جدًا 😍</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(0, 'q1', 'راض', 'opt-0-2')" id="opt-0-2">
+                  <input type="radio" name="feedback-q1" class="option-radio" value="راض">
+                  <span class="option-label">راضٍ 🙂</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(0, 'q1', 'محايد', 'opt-0-3')" id="opt-0-3">
+                  <input type="radio" name="feedback-q1" class="option-radio" value="محايد">
+                  <span class="option-label">محايد 😐</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(0, 'q1', 'غير راضٍ', 'opt-0-4')" id="opt-0-4">
+                  <input type="radio" name="feedback-q1" class="option-radio" value="غير راضٍ">
+                  <span class="option-label">غير راضٍ 🙁</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(0, 'q1', 'غير راضٍ تمامًا', 'opt-0-5')" id="opt-0-5">
+                  <input type="radio" name="feedback-q1" class="option-radio" value="غير راضٍ تمامًا">
+                  <span class="option-label">غير راضٍ تماماً 😡</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q2: Learning Outcome -->
+            <div class="question-card" id="q-card-1">
+              <div class="question-text"><strong>سؤال 2:</strong> هل ترى أنك حققت نتيجة التعلم المطلوبة؟</div>
+              <div class="options-list">
+                <div class="option-item" onclick="selectFeedbackOption(1, 'q2', 'نعم', 'opt-1-1')" id="opt-1-1">
+                  <input type="radio" name="feedback-q2" class="option-radio" value="نعم">
+                  <span class="option-label">نعم 👍</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(1, 'q2', 'لا', 'opt-1-2')" id="opt-1-2">
+                  <input type="radio" name="feedback-q2" class="option-radio" value="لا">
+                  <span class="option-label">لا 👎</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(1, 'q2', 'لست متأكدًا', 'opt-1-3')" id="opt-1-3">
+                  <input type="radio" name="feedback-q2" class="option-radio" value="لست متأكدًا">
+                  <span class="option-label">لست متأكداً 🤔</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q3: Instructor Performance -->
+            <div class="question-card" id="q-card-2">
+              <div class="question-text"><strong>سؤال 3:</strong> كيف يمكنك تقييم الأداء العام للمُحاضر؟</div>
+              <div class="rating-range-container">
+                <div class="range-labels">
+                  <span>ممتاز 🌟</span>
+                  <span>سيء 🙁</span>
+                </div>
+                <div class="star-rating-row">
+                  <button type="button" class="star-btn" onclick="setStarRating(1)" id="star-1">1</button>
+                  <button type="button" class="star-btn" onclick="setStarRating(2)" id="star-2">2</button>
+                  <button type="button" class="star-btn" onclick="setStarRating(3)" id="star-3">3</button>
+                  <button type="button" class="star-btn" onclick="setStarRating(4)" id="star-4">4</button>
+                  <button type="button" class="star-btn" onclick="setStarRating(5)" id="star-5">5</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q4: Expectations -->
+            <div class="question-card" id="q-card-3">
+              <div class="question-text"><strong>سؤال 4:</strong> هل كانت المحاضرة تفي بتوقعاتك؟</div>
+              <div class="options-list">
+                <div class="option-item" onclick="selectFeedbackOption(3, 'q4', 'نعم', 'opt-3-1')" id="opt-3-1">
+                  <input type="radio" name="feedback-q4" class="option-radio" value="نعم">
+                  <span class="option-label">نعم 👍</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(3, 'q4', 'لا', 'opt-3-2')" id="opt-3-2">
+                  <input type="radio" name="feedback-q4" class="option-radio" value="لا">
+                  <span class="option-label">لا 👎</span>
+                </div>
+                <div class="option-item" onclick="selectFeedbackOption(3, 'q4', 'لست متأكدًا', 'opt-3-3')" id="opt-3-3">
+                  <input type="radio" name="feedback-q4" class="option-radio" value="لست متأكدًا">
+                  <span class="option-label">لست متأكداً 🤔</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q5: Recommendation Probability -->
+            <div class="question-card" id="q-card-4">
+              <div class="question-text"><strong>سؤال 5:</strong> ما احتمالية أن توصي صديقًا أو زميلًا بمتابعة مبادرة ما ينفع الناس؟</div>
+              <div class="rating-range-container">
+                <div class="range-labels">
+                  <span>محتمل للغاية 😍</span>
+                  <span>غير محتمل على الإطلاق 🙁</span>
+                </div>
+                <div class="star-rating-row">
+                  <button type="button" class="star-btn np-btn" onclick="setNpsRating(1)" id="nps-1">1</button>
+                  <button type="button" class="star-btn np-btn" onclick="setNpsRating(2)" id="nps-2">2</button>
+                  <button type="button" class="star-btn np-btn" onclick="setNpsRating(3)" id="nps-3">3</button>
+                  <button type="button" class="star-btn np-btn" onclick="setNpsRating(4)" id="nps-4">4</button>
+                  <button type="button" class="star-btn np-btn" onclick="setNpsRating(5)" id="nps-5">5</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q6: Suggested Lectures -->
+            <div class="question-card" id="q-card-5">
+              <div class="question-text"><strong>سؤال 6:</strong> لو حابب تقترح علينا محاضرات نقدمها الفترة الجاية اتفضل؟ (اختياري)</div>
+              <div class="form-group" style="margin-top: 15px;">
+                <textarea id="feedback-q6" class="form-input" rows="4" placeholder="اكتب مقترحاتك هنا للمحاضرات القادمة..." style="text-align: right; resize: none;"></textarea>
+              </div>
+            </div>
+
+            <!-- Q7: Suggested Improvements -->
+            <div class="question-card" id="q-card-6">
+              <div class="question-text"><strong>سؤال 7:</strong> لو حابب تقول حاجة شايف إن احنا محتاجين نعدلها في المحاضرات الجاية اتفضل؟ (اختياري)</div>
+              <div class="form-group" style="margin-top: 15px;">
+                <textarea id="feedback-q7" class="form-input" rows="4" placeholder="اكتب أي ملاحظات أو نقاط تحسين ترغب بها هنا..." style="text-align: right; resize: none;"></textarea>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display: flex; justify-content: space-between; gap: 15px; margin-top: 20px;">
+            <button type="button" id="btn-feedback-prev" class="btn btn-secondary" onclick="navigateFeedbackQuestion(-1)" style="flex: 1;">السابق</button>
+            <button type="button" id="btn-feedback-next" class="btn btn-primary" onclick="navigateFeedbackQuestion(1)" style="flex: 1;">التالي</button>
+          </div>
+
+          <button type="submit" id="btn-feedback-submit" class="btn btn-accent" style="width: 100%; margin-top: 15px; display: none;">إرسال التقييم وإنهاء الاستبيان 🏁</button>
+        </form>
+      </div>
+
+      <!-- ================= SCREEN: FEEDBACK SUCCESS ================= -->
+      <div id="screen-feedback-result" class="screen">
+        <div class="header">
+          <div class="success-icon">💖</div>
+          <h2 class="result-title">تم استلام تقييمك بنجاح!</h2>
+          <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;" id="result-student-name">طالب مسجل</span>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0; color: var(--text-secondary); line-height: 1.6; font-size: 14px;">
+          شكراً جزيلاً لمشاركتنا رأيك الصادق! <br> 
+          ملاحظاتك تساعدنا في تطوير وتجويد المحاضرات القادمة في مبادرة ما ينفع الناس لتقديم أفضل محتوى طبي ممكن لكم.
+        </div>
+
+        <div style="margin-top: 25px; text-align: center;">
+          <a href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank" class="btn btn-primary facebook-link-href" style="display: inline-block; width: 100%; text-decoration: none;">متابعة صفحة الفيسبوك الرسمية للمبادرة</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script>
+  // Feedback App State
+  var state = {
+    phone: "",
+    studentName: "",
+    session: "",
+    campName: "",
+    logoUrl: "",
+    currentQIndex: 0,
+    answers: {
+      q1: "",
+      q2: "",
+      q3: "",
+      q4: "",
+      q5: "",
+      q6: "",
+      q7: ""
+    }
+  };
+
+  var API_URL = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
+
+  function callServerOption(action, args, onSuccess, onFailure) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      var runner = google.script.run;
+      if (onSuccess) runner = runner.withSuccessHandler(onSuccess);
+      if (onFailure) runner = runner.withFailureHandler(onFailure);
+      runner[action].apply(runner, args);
+    } else {
+      // Hybrid mode - call Apps Script via HTTP fetch POST
+      fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({ action: action, args: args })
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data && data.error) {
+          if (onFailure) onFailure(new Error(data.error));
+        } else {
+          if (onSuccess) onSuccess(data);
+        }
+      })
+      .catch(function(err) {
+        if (onFailure) onFailure(err);
+      });
+    }
+  }
+
+  var sessionsGuideList = [
+    "التمهيد والترحيب (Opening & Orientation)",
+    "Session 1: Interview Skills, CV Writing & LinkedIn",
+    "Session 2: Professional Autonomy & Accountability",
+    "Session 3: ECG Interpretation",
+    "Session 4: Medication Safety & High Alert Medications",
+    "Session 5: ABG Interpretation & Patient Deterioration",
+    "Session 6: Trauma, Stroke & Acute Coronary Syndrome",
+    "Session 7: Care of Mechanically Ventilated Patients",
+    "Session 8: Panic Situations - Lines, Tubes & Drains",
+    "Session 9: Code Blue Management & Crash Cart",
+    "Session 10: Infection Prevention and Control (IPC)",
+    "Session 11: Quality Improvement & Patient Safety",
+    "Session 12: Soft Skills",
+    "Session 13: Communication Skills, SBAR & Documentation",
+    "Session 14: Career Development & Opportunities",
+    "المناقشة المفتوحة وحفل الختام (Closing Ceremony)"
+  ];
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+  });
+
+  function initApp() {
+    showLoading("جاري تحميل إعدادات النظام...");
+    clearAlerts();
+
+    callServerOption("getSystemSettings", [], onSettingsLoaded, onSettingsError);
+  }
+
+  function onSettingsLoaded(settings) {
+    hideLoading();
+    if (settings.error) {
+      showGlobalError(settings.error);
+      return;
+    }
+
+    state.campName = settings.CampName || "Camp";
+    state.session = settings.CurrentSession || "0";
+    state.logoUrl = normalizeLogoUrl(settings.LogoURL);
+
+    // Update Facebook Links
+    var fbUrls = document.querySelectorAll('.facebook-link-href');
+    fbUrls.forEach(function(el) {
+      el.href = settings.FacebookURL || "https://www.facebook.com/profile.php?id=61575638669904";
+    });
+
+    // Update branding text
+    updateBranding();
+  }
+
+  function onSettingsError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل تحميل إعدادات النظام: " + err.message, "danger");
+  }
+
+  function normalizeLogoUrl(url) {
+    if (!url) return "";
+    var drivePattern = /drive\.google\.com\/file\/d\/([^\/]+)/;
+    var match = url.match(drivePattern);
+    if (match && match[1]) {
+      return "https://lh3.googleusercontent.com/d/" + match[1];
+    }
+    return url;
+  }
+
+  function updateBranding() {
+    var subtitles = document.querySelectorAll('.dynamic-camp-subtitle');
+    subtitles.forEach(function(el) {
+      el.textContent = state.campName;
+    });
+
+    var badges = document.querySelectorAll('.dynamic-session-badge');
+    badges.forEach(function(el) {
+      el.textContent = "تقييم: " + getSessionName(state.session);
+    });
+
+    var logos = document.querySelectorAll('.dynamic-logo-img');
+    logos.forEach(function(el) {
+      if (state.logoUrl) {
+        el.src = state.logoUrl;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function handleAuthSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    var phoneInput = document.getElementById('input-feedback-phone');
+    var rawPhone = phoneInput.value.trim();
+
+    if (!rawPhone || rawPhone.replace(/[^\d]/g, "").length < 8) {
+      showAlert("auth-alert", "يرجى إدخال رقم هاتف صحيح.", "danger");
+      return;
+    }
+
+    showLoading("جاري التحقق من رقم الهاتف...");
+    state.phone = rawPhone;
+
+    callServerOption("checkFeedbackStatus", [rawPhone], onFeedbackStatusLoaded, onAuthError);
+  }
+
+  function onFeedbackStatusLoaded(res) {
+    if (res.status === "CLOSED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "warning");
+      return;
+    }
+
+    if (res.status === "NOT_REGISTERED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    if (res.status === "INVALID_PHONE") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    state.studentName = res.studentName;
+
+    if (res.status === "ALREADY_SUBMITTED") {
+      hideLoading();
+      showResultsScreen();
+      return;
+    }
+
+    // Status is READY
+    hideLoading();
+    document.getElementById("feedback-current-session-title").textContent = "تقييم: " + getSessionName(state.session);
+    showScreen("screen-feedback-questions");
+    updateFeedbackNavigation();
+  }
+
+  function onAuthError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل عملية التحقق: " + err.message, "danger");
+  }
+
+  function selectFeedbackOption(qIdx, questionKey, val, optId) {
+    // Unselect others in the same question card
+    var siblingOptions = document.querySelectorAll("#q-card-" + qIdx + " .option-item");
+    siblingOptions.forEach(function(el) {
+      el.classList.remove("selected");
+      var radio = el.querySelector(".option-radio");
+      if (radio) radio.checked = false;
+    });
+
+    // Select this option
+    var selectedDiv = document.getElementById(optId);
+    if (selectedDiv) {
+      selectedDiv.classList.add("selected");
+      var radio = selectedDiv.querySelector(".option-radio");
+      if (radio) radio.checked = true;
+    }
+
+    // Save answer
+    state.answers[questionKey] = val;
+  }
+
+  function setStarRating(ratingVal) {
+    // Reset stars
+    for (var i = 1; i <= 5; i++) {
+      var star = document.getElementById("star-" + i);
+      if (i <= ratingVal) {
+        star.classList.add("active");
+      } else {
+        star.classList.remove("active");
+      }
+    }
+    state.answers.q3 = ratingVal;
+  }
+
+  function setNpsRating(ratingVal) {
+    // Reset NPS buttons
+    for (var i = 1; i <= 5; i++) {
+      var btn = document.getElementById("nps-" + i);
+      if (i <= ratingVal) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    }
+    state.answers.q5 = ratingVal;
+  }
+
+  function navigateFeedbackQuestion(direction) {
+    var newIdx = state.currentQIndex + direction;
+    if (newIdx < 0 || newIdx >= 7) return;
+
+    // Hide current question
+    document.getElementById("q-card-" + state.currentQIndex).classList.remove("active");
+    
+    state.currentQIndex = newIdx;
+    
+    // Show new question
+    document.getElementById("q-card-" + state.currentQIndex).classList.add("active");
+
+    updateFeedbackNavigation();
+  }
+
+  function updateFeedbackNavigation() {
+    document.getElementById("current-q-index").textContent = state.currentQIndex + 1;
+    
+    // Update progress bar
+    var progressPct = ((state.currentQIndex + 1) / 7) * 100;
+    document.getElementById("feedback-progress-fill").style.width = progressPct + "%";
+
+    // Show / hide buttons
+    var btnPrev = document.getElementById("btn-feedback-prev");
+    var btnNext = document.getElementById("btn-feedback-next");
+    var btnSubmit = document.getElementById("btn-feedback-submit");
+
+    btnPrev.disabled = (state.currentQIndex === 0);
+    
+    if (state.currentQIndex === 6) {
+      btnNext.style.display = "none";
+      btnSubmit.style.display = "block";
+    } else {
+      btnNext.style.display = "block";
+      btnSubmit.style.display = "none";
+    }
+  }
+
+  function handleFeedbackSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    // Check if required questions are answered (q1, q2, q3, q4, q5)
+    var unanswered = [];
+    if (!state.answers.q1) unanswered.push(1);
+    if (!state.answers.q2) unanswered.push(2);
+    if (!state.answers.q3) unanswered.push(3);
+    if (!state.answers.q4) unanswered.push(4);
+    if (!state.answers.q5) unanswered.push(5);
+
+    if (unanswered.length > 0) {
+      showAlert("feedback-alert", "يرجى الإجابة على الأسئلة الإجبارية قبل الإرسال. الأسئلة المتبقية: " + unanswered.join(", "), "warning");
+      return;
+    }
+
+    // Collect text values
+    state.answers.q6 = document.getElementById("feedback-q6").value.trim();
+    state.answers.q7 = document.getElementById("feedback-q7").value.trim();
+
+    showLoading("جاري تسجيل تقييمك سحابياً...");
+
+    callServerOption("submitFeedbackAnswers", [state.phone, state.answers], onFeedbackSubmitted, onFeedbackSubmitError);
+  }
+
+  function onFeedbackSubmitted(res) {
+    hideLoading();
+    if (res.error) {
+      showAlert("feedback-alert", res.error, "danger");
+      return;
+    }
+
+    showResultsScreen();
+  }
+
+  function onFeedbackSubmitError(err) {
+    hideLoading();
+    showAlert("feedback-alert", "فشل إرسال تقييمك: " + err.message, "danger");
+  }
+
+  function showResultsScreen() {
+    document.getElementById("result-student-name").textContent = state.studentName;
+    showScreen("screen-feedback-result");
+  }
+
+  function showScreen(screenId) {
+    var screens = document.querySelectorAll('.screen');
+    var targetScreen = document.getElementById(screenId);
+
+    if (!targetScreen) return;
+
+    screens.forEach(function(scr) {
+      if (scr.classList.contains('active')) {
+        scr.classList.remove('active');
+        scr.style.display = 'none';
+      }
+    });
+
+    targetScreen.style.display = 'block';
+    void targetScreen.offsetWidth; // Force reflow
+    targetScreen.classList.add('active');
+  }
+
+  function showLoading(text) {
+    var overlay = document.getElementById('loading-overlay');
+    var overlayText = document.getElementById('loading-text');
+    if (overlay) {
+      overlayText.textContent = text || "جاري التحميل...";
+      overlay.classList.add('active');
+    }
+  }
+
+  function hideLoading() {
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  }
+
+  function showAlert(containerId, message, type) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    var alertClass = 'alert-info';
+    var icon = 'ℹ️';
+
+    if (type === 'danger') {
+      alertClass = 'alert-danger';
+      icon = '⚠️';
+    } else if (type === 'warning') {
+      alertClass = 'alert-warning';
+      icon = '🔔';
+    }
+
+    container.innerHTML = 
+      '<div class="alert ' + alertClass + '">' +
+        '<span>' + icon + '</span>' +
+        '<div>' + message + '</div>' +
+      '</div>';
+  }
+
+  function clearAlerts() {
+    var containers = ['auth-alert', 'feedback-alert'];
+    containers.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+  }
+
+  function showGlobalError(msg) {
+    showAlert('auth-alert', msg, 'danger');
+  }
+</script>
+
+  </body>
+</html>

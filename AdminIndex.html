@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم الإدارية - مبادرة ما ينفع الناس</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Styles -->
+    <?!= include("AdminStyle"); ?>
+  </head>
+  <body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="app-container">
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner spinner-dark"></div>
+        <div id="loading-text" class="loading-text">جاري تحميل البيانات الإدارية...</div>
+      </div>
+
+      <!-- ================= SCREEN: PIN LOGIN ================= -->
+      <div id="screen-admin-login" class="screen active">
+        <div class="header">
+          <div class="brand-logo-container">
+            <span class="brand-logo-text-fallback">🎛️</span>
+            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if (fb && this.src.indexOf('base64') === -1) { fb.style.display='none'; this.style.display='block'; }" onerror="this.style.display='none'; var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if(fb) fb.style.display='block';" alt="Logo">
+          </div>
+          <h1 class="camp-title-styled">
+            <span class="title-internship">ADMIN</span>
+            <span class="title-camp">PANEL</span>
+          </h1>
+          <div class="camp-subtitle dynamic-camp-subtitle">لوحة التحكم بالنظام الإداري للمبادرة</div>
+        </div>
+
+        <div id="login-alert"></div>
+
+        <form id="form-admin-login" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label for="input-admin-pin" class="form-label">الرمز السري للإدارة (PIN):</label>
+            <input type="password" id="input-admin-pin" class="form-input" placeholder="••••" required inputmode="numeric" maxlength="8" style="letter-spacing: 6px; text-align: center; font-size: 18px;">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            تسجيل الدخول للوحة التحكم
+          </button>
+        </form>
+      </div>
+
+      <!-- ================= SCREEN: DASHBOARD ================= -->
+      <div id="screen-admin-dashboard" class="screen">
+        <div class="header" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="padding: 6px 12px; font-size: 11px;">خروج 🚪</button>
+            <span class="session-badge dynamic-session-badge">لوحة الإدارة والتحكم</span>
+          </div>
+          <div class="brand-logo-container" style="width: 50px; height: 50px; margin: 10px auto;">
+            <span class="brand-logo-text-fallback">🎛️</span>
+            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if (fb && this.src.indexOf('base64') === -1) { fb.style.display='none'; this.style.display='block'; }" onerror="this.style.display='none'; var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if(fb) fb.style.display='block';" alt="Logo">
+          </div>
+          <h2 class="dashboard-title" id="admin-camp-title">كامب الامتياز</h2>
+        </div>
+
+        <div id="dashboard-alert"></div>
+
+        <!-- Section: Statistics -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-registered">-</div>
+            <div class="stat-label">المسجلين بالكامب</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-attendees">-</div>
+            <div class="stat-label">حضور المحاضرة</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-quiz-takers">-</div>
+            <div class="stat-label">مؤدي الكويز</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-quiz-avg">-</div>
+            <div class="stat-label">متوسط الدرجات</div>
+          </div>
+        </div>
+
+        <!-- Section: Configuration Form -->
+        <div class="admin-card">
+          <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
+          
+          <div class="form-group">
+            <label for="select-admin-session" class="form-label">المحاضرة النشطة حالياً (الحضور والكويز):</label>
+            <select id="select-admin-session" class="form-select">
+              <!-- Dynamically populated options S0..S15 -->
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="select-admin-feedback-session" class="form-label">المحاضرة النشطة لاستبيان التقييم (Feedback):</label>
+            <select id="select-admin-feedback-session" class="form-select">
+              <!-- Dynamically populated options S0..S15 -->
+            </select>
+          </div>
+
+          <div class="toggle-group">
+            <div>
+              <div class="toggle-title">تسجيل الحضور والتحضير</div>
+              <div class="toggle-desc">فتح أو إغلاق إمكانية التحضير للطلاب</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-attendance-status">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="toggle-group" style="margin-top: 15px;">
+            <div>
+              <div class="toggle-title">تفعيل الكويز التفاعلي</div>
+              <div class="toggle-desc">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-quiz-status">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="toggle-group" style="margin-top: 15px;">
+            <div>
+              <div class="toggle-title">تفعيل استطلاع الرأي والتقييم</div>
+              <div class="toggle-desc">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-feedback-status">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="input-admin-camp-name" class="form-label">اسم الكامب التدريبي:</label>
+            <input type="text" id="input-admin-camp-name" class="form-input" required>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="input-admin-min-attendance" class="form-label">الحد الأدنى للمحاضرات للشهادة:</label>
+            <input type="number" id="input-admin-min-attendance" class="form-input" min="1" max="16" required>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="input-admin-logo-url" class="form-label">رابط لوجو الكامب (جوجل درايف أو رابط مباشر):</label>
+            <input type="text" id="input-admin-logo-url" class="form-input" placeholder="مثال: https://drive.google.com/file/d/...">
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="input-admin-facebook-url" class="form-label">رابط صفحة فيسبوك الرسمية للمبادرة:</label>
+            <input type="text" id="input-admin-facebook-url" class="form-input" placeholder="https://www.facebook.com/yourpage">
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
+            <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
+          </div>
+
+          <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+            حفظ التغييرات وتعميمها 💾
+          </button>
+        </div>
+
+        <!-- Section: Links & Announcements -->
+        <div class="admin-card" style="margin-top: 20px;">
+          <h3 class="card-title">روابط النشر والإعلان 🔗</h3>
+
+          <div class="link-item">
+            <div class="link-label">رابط تسجيل الحضور للطلاب:</div>
+            <div class="link-row">
+              <input type="text" id="link-attendance-url" readonly class="form-input link-readonly">
+              <button onclick="copyToClipboard('link-attendance-url')" class="btn btn-secondary">نسخ</button>
+            </div>
+          </div>
+
+          <div class="link-item">
+            <div class="link-label">رابط الكويز المخصص للطلاب:</div>
+            <div class="link-row">
+              <input type="text" id="link-quiz-url" readonly class="form-input link-readonly">
+              <button onclick="copyToClipboard('link-quiz-url')" class="btn btn-secondary">نسخ</button>
+            </div>
+          </div>
+
+          <div class="link-item">
+            <div class="link-label">رابط استطلاع الرأي المخصص للطلاب:</div>
+            <div class="link-row">
+              <input type="text" id="link-feedback-url" readonly class="form-input link-readonly">
+              <button onclick="copyToClipboard('link-feedback-url')" class="btn btn-secondary">نسخ</button>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <button onclick="generateAnnouncement('attendance')" class="btn btn-secondary" style="font-size: 12px; width: 100%;">
+              📢 توليد رسالة إعلان الحضور (واتساب)
+            </button>
+            <button onclick="generateAnnouncement('quiz')" class="btn btn-secondary" style="font-size: 12px; width: 100%;">
+              📝 توليد رسالة إعلان الكويز (واتساب)
+            </button>
+            <button onclick="generateAnnouncement('feedback')" class="btn btn-secondary" style="font-size: 12px; width: 100%;">
+              💖 توليد رسالة إعلان استطلاع الرأي (واتساب)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div id="announcement-modal" class="modal">
+      <div class="modal-content">
+        <h3 class="card-title" style="margin-bottom: 15px;">نص الإعلان الجاهز للنشر</h3>
+        <textarea id="announcement-text" class="form-input" rows="7" style="font-family: inherit; font-size: 13px; text-align: right; line-height: 1.6; margin-bottom: 15px; width: 100%;" readonly></textarea>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="copyToClipboard('announcement-text')" class="btn btn-primary" style="flex: 1;">نسخ النص</button>
+          <button onclick="closeModal()" class="btn btn-secondary" style="flex: 1;">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <?!= include("AdminScript"); ?>
+  </body>
+</html>

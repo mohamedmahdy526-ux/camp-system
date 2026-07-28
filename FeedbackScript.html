@@ -1,0 +1,406 @@
+<script>
+  // Feedback App State
+  var state = {
+    phone: "",
+    studentName: "",
+    session: "",
+    campName: "",
+    logoUrl: "",
+    currentQIndex: 0,
+    answers: {
+      q1: "",
+      q2: "",
+      q3: "",
+      q4: "",
+      q5: "",
+      q6: "",
+      q7: ""
+    }
+  };
+
+  var API_URL = "https://script.google.com/macros/s/AKfycbxwvoZxEKxJ72BijGNmtV8lMvnldzQOYEmk_bYr_j3OCM_J3RFbTarpFfphhvfC2Ezy/exec";
+
+  function callServerOption(action, args, onSuccess, onFailure) {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      var runner = google.script.run;
+      if (onSuccess) runner = runner.withSuccessHandler(onSuccess);
+      if (onFailure) runner = runner.withFailureHandler(onFailure);
+      runner[action].apply(runner, args);
+    } else {
+      // Hybrid mode - call Apps Script via HTTP fetch POST
+      fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({ action: action, args: args })
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data && data.error) {
+          if (onFailure) onFailure(new Error(data.error));
+        } else {
+          if (onSuccess) onSuccess(data);
+        }
+      })
+      .catch(function(err) {
+        if (onFailure) onFailure(err);
+      });
+    }
+  }
+
+  var sessionsGuideList = [
+    "التمهيد والترحيب (Opening & Orientation)",
+    "Session 1: Interview Skills, CV Writing & LinkedIn",
+    "Session 2: Professional Autonomy & Accountability",
+    "Session 3: ECG Interpretation",
+    "Session 4: Medication Safety & High Alert Medications",
+    "Session 5: ABG Interpretation & Patient Deterioration",
+    "Session 6: Trauma, Stroke & Acute Coronary Syndrome",
+    "Session 7: Care of Mechanically Ventilated Patients",
+    "Session 8: Panic Situations - Lines, Tubes & Drains",
+    "Session 9: Code Blue Management & Crash Cart",
+    "Session 10: Infection Prevention and Control (IPC)",
+    "Session 11: Quality Improvement & Patient Safety",
+    "Session 12: Soft Skills",
+    "Session 13: Communication Skills, SBAR & Documentation",
+    "Session 14: Career Development & Opportunities",
+    "المناقشة المفتوحة وحفل الختام (Closing Ceremony)"
+  ];
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+  });
+
+  function initApp() {
+    showLoading("جاري تحميل إعدادات النظام...");
+    clearAlerts();
+
+    callServerOption("getSystemSettings", [], onSettingsLoaded, onSettingsError);
+  }
+
+  function onSettingsLoaded(settings) {
+    hideLoading();
+    if (settings.error) {
+      showGlobalError(settings.error);
+      return;
+    }
+
+    state.campName = settings.CampName || "Camp";
+    state.session = settings.CurrentSession || "0";
+    state.logoUrl = normalizeLogoUrl(settings.LogoURL);
+
+    // Update Facebook Links
+    var fbUrls = document.querySelectorAll('.facebook-link-href');
+    fbUrls.forEach(function(el) {
+      el.href = settings.FacebookURL || "https://www.facebook.com/profile.php?id=61575638669904";
+    });
+
+    // Update branding text
+    updateBranding();
+  }
+
+  function onSettingsError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل تحميل إعدادات النظام: " + err.message, "danger");
+  }
+
+  function normalizeLogoUrl(url) {
+    if (!url) return "";
+    var drivePattern = /drive\.google\.com\/file\/d\/([^\/]+)/;
+    var match = url.match(drivePattern);
+    if (match && match[1]) {
+      return "https://lh3.googleusercontent.com/d/" + match[1];
+    }
+    return url;
+  }
+
+  function updateBranding() {
+    var subtitles = document.querySelectorAll('.dynamic-camp-subtitle');
+    subtitles.forEach(function(el) {
+      el.textContent = state.campName;
+    });
+
+    var badges = document.querySelectorAll('.dynamic-session-badge');
+    badges.forEach(function(el) {
+      el.textContent = "تقييم: " + getSessionName(state.session);
+    });
+
+    var logos = document.querySelectorAll('.dynamic-logo-img');
+    logos.forEach(function(el) {
+      if (state.logoUrl) {
+        el.src = state.logoUrl;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function handleAuthSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    var phoneInput = document.getElementById('input-feedback-phone');
+    var rawPhone = phoneInput.value.trim();
+
+    if (!rawPhone || rawPhone.replace(/[^\d]/g, "").length < 8) {
+      showAlert("auth-alert", "يرجى إدخال رقم هاتف صحيح.", "danger");
+      return;
+    }
+
+    showLoading("جاري التحقق من رقم الهاتف...");
+    state.phone = rawPhone;
+
+    callServerOption("checkFeedbackStatus", [rawPhone], onFeedbackStatusLoaded, onAuthError);
+  }
+
+  function onFeedbackStatusLoaded(res) {
+    if (res.status === "CLOSED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "warning");
+      return;
+    }
+
+    if (res.status === "NOT_REGISTERED") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    if (res.status === "INVALID_PHONE") {
+      hideLoading();
+      showAlert("auth-alert", res.message, "danger");
+      return;
+    }
+
+    state.studentName = res.studentName;
+
+    if (res.status === "ALREADY_SUBMITTED") {
+      hideLoading();
+      showResultsScreen();
+      return;
+    }
+
+    // Status is READY
+    hideLoading();
+    document.getElementById("feedback-current-session-title").textContent = "تقييم: " + getSessionName(state.session);
+    showScreen("screen-feedback-questions");
+    updateFeedbackNavigation();
+  }
+
+  function onAuthError(err) {
+    hideLoading();
+    showAlert("auth-alert", "فشل عملية التحقق: " + err.message, "danger");
+  }
+
+  function selectFeedbackOption(qIdx, questionKey, val, optId) {
+    // Unselect others in the same question card
+    var siblingOptions = document.querySelectorAll("#q-card-" + qIdx + " .option-item");
+    siblingOptions.forEach(function(el) {
+      el.classList.remove("selected");
+      var radio = el.querySelector(".option-radio");
+      if (radio) radio.checked = false;
+    });
+
+    // Select this option
+    var selectedDiv = document.getElementById(optId);
+    if (selectedDiv) {
+      selectedDiv.classList.add("selected");
+      var radio = selectedDiv.querySelector(".option-radio");
+      if (radio) radio.checked = true;
+    }
+
+    // Save answer
+    state.answers[questionKey] = val;
+  }
+
+  function setStarRating(ratingVal) {
+    // Reset stars
+    for (var i = 1; i <= 5; i++) {
+      var star = document.getElementById("star-" + i);
+      if (i <= ratingVal) {
+        star.classList.add("active");
+      } else {
+        star.classList.remove("active");
+      }
+    }
+    state.answers.q3 = ratingVal;
+  }
+
+  function setNpsRating(ratingVal) {
+    // Reset NPS buttons
+    for (var i = 1; i <= 5; i++) {
+      var btn = document.getElementById("nps-" + i);
+      if (i <= ratingVal) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    }
+    state.answers.q5 = ratingVal;
+  }
+
+  function navigateFeedbackQuestion(direction) {
+    var newIdx = state.currentQIndex + direction;
+    if (newIdx < 0 || newIdx >= 7) return;
+
+    // Hide current question
+    document.getElementById("q-card-" + state.currentQIndex).classList.remove("active");
+    
+    state.currentQIndex = newIdx;
+    
+    // Show new question
+    document.getElementById("q-card-" + state.currentQIndex).classList.add("active");
+
+    updateFeedbackNavigation();
+  }
+
+  function updateFeedbackNavigation() {
+    document.getElementById("current-q-index").textContent = state.currentQIndex + 1;
+    
+    // Update progress bar
+    var progressPct = ((state.currentQIndex + 1) / 7) * 100;
+    document.getElementById("feedback-progress-fill").style.width = progressPct + "%";
+
+    // Show / hide buttons
+    var btnPrev = document.getElementById("btn-feedback-prev");
+    var btnNext = document.getElementById("btn-feedback-next");
+    var btnSubmit = document.getElementById("btn-feedback-submit");
+
+    btnPrev.disabled = (state.currentQIndex === 0);
+    
+    if (state.currentQIndex === 6) {
+      btnNext.style.display = "none";
+      btnSubmit.style.display = "block";
+    } else {
+      btnNext.style.display = "block";
+      btnSubmit.style.display = "none";
+    }
+  }
+
+  function handleFeedbackSubmit(e) {
+    if (e) e.preventDefault();
+    clearAlerts();
+
+    // Check if required questions are answered (q1, q2, q3, q4, q5)
+    var unanswered = [];
+    if (!state.answers.q1) unanswered.push(1);
+    if (!state.answers.q2) unanswered.push(2);
+    if (!state.answers.q3) unanswered.push(3);
+    if (!state.answers.q4) unanswered.push(4);
+    if (!state.answers.q5) unanswered.push(5);
+
+    if (unanswered.length > 0) {
+      showAlert("feedback-alert", "يرجى الإجابة على الأسئلة الإجبارية قبل الإرسال. الأسئلة المتبقية: " + unanswered.join(", "), "warning");
+      return;
+    }
+
+    // Collect text values
+    state.answers.q6 = document.getElementById("feedback-q6").value.trim();
+    state.answers.q7 = document.getElementById("feedback-q7").value.trim();
+
+    showLoading("جاري تسجيل تقييمك سحابياً...");
+
+    callServerOption("submitFeedbackAnswers", [state.phone, state.answers], onFeedbackSubmitted, onFeedbackSubmitError);
+  }
+
+  function onFeedbackSubmitted(res) {
+    hideLoading();
+    if (res.error) {
+      showAlert("feedback-alert", res.error, "danger");
+      return;
+    }
+
+    showResultsScreen();
+  }
+
+  function onFeedbackSubmitError(err) {
+    hideLoading();
+    showAlert("feedback-alert", "فشل إرسال تقييمك: " + err.message, "danger");
+  }
+
+  function showResultsScreen() {
+    document.getElementById("result-student-name").textContent = state.studentName;
+    showScreen("screen-feedback-result");
+  }
+
+  function showScreen(screenId) {
+    var screens = document.querySelectorAll('.screen');
+    var targetScreen = document.getElementById(screenId);
+
+    if (!targetScreen) return;
+
+    screens.forEach(function(scr) {
+      if (scr.classList.contains('active')) {
+        scr.classList.remove('active');
+        scr.style.display = 'none';
+      }
+    });
+
+    targetScreen.style.display = 'block';
+    void targetScreen.offsetWidth; // Force reflow
+    targetScreen.classList.add('active');
+  }
+
+  function showLoading(text) {
+    var overlay = document.getElementById('loading-overlay');
+    var overlayText = document.getElementById('loading-text');
+    if (overlay) {
+      overlayText.textContent = text || "جاري التحميل...";
+      overlay.classList.add('active');
+    }
+  }
+
+  function hideLoading() {
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+  }
+
+  function showAlert(containerId, message, type) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    var alertClass = 'alert-info';
+    var icon = 'ℹ️';
+
+    if (type === 'danger') {
+      alertClass = 'alert-danger';
+      icon = '⚠️';
+    } else if (type === 'warning') {
+      alertClass = 'alert-warning';
+      icon = '🔔';
+    }
+
+    container.innerHTML = 
+      '<div class="alert ' + alertClass + '">' +
+        '<span>' + icon + '</span>' +
+        '<div>' + message + '</div>' +
+      '</div>';
+  }
+
+  function clearAlerts() {
+    var containers = ['auth-alert', 'feedback-alert'];
+    containers.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+  }
+
+  function showGlobalError(msg) {
+    showAlert('auth-alert', msg, 'danger');
+  }
+</script>
