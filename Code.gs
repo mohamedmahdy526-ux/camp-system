@@ -2,6 +2,7 @@
  * Entrypoint and API Router for Camp Attendance System.
  * Serves the HTML frontend and exposes functions for google.script.run client calls.
  */
+// Production Deployment - Clean Build v5.6.1
 
 /**
  * Serves the main HTML application.
