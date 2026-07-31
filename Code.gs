@@ -220,7 +220,7 @@ function setupSheets() {
     settingsSheet.appendRow(["CampName", "كامب الامتياز لطلاب التمريض - مبادرة ما ينفع الناس"]);
     settingsSheet.appendRow(["CurrentSession", "0"]); // Start with 0 (Orientation)
     settingsSheet.appendRow(["Attendance", "OPEN"]);
-    settingsSheet.appendRow(["MinAttendance", "10"]);
+    settingsSheet.appendRow(["MinAttendance", "13"]);
     settingsSheet.appendRow(["LogoURL", "https://lh3.googleusercontent.com/d/167rdAQntynxuH3mRHZYa6eabz4qRiyYR"]);
     settingsSheet.appendRow(["AdminPIN", "1234"]);
     // Format headers

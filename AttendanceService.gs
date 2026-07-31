@@ -38,6 +38,18 @@ var AttendanceService = {
   },
 
   /**
+   * Formats a string to Title Case.
+   * @param {string} str
+   * @returns {string} Formatted string.
+   */
+  toTitleCase: function(str) {
+    if (!str) return "";
+    return str.toLowerCase().replace(/\b\w/g, function(char) {
+      return char.toUpperCase();
+    });
+  },
+
+  /**
    * Translates current session index (0 to 15) to the actual sheet header column name.
    * @param {string|number} session
    * @returns {string}
@@ -198,7 +210,7 @@ var AttendanceService = {
       var newStudent = {
         "Phone": studentData.Phone.toString().trim(),
         "Name AR": studentData.NameAr.trim(),
-        "Name EN": studentData.NameEn.trim(),
+        "Name EN": this.toTitleCase(studentData.NameEn.trim()),
         "University": studentData.University.trim(),
         "Email": studentData.Email.trim().toLowerCase()
       };
@@ -311,7 +323,7 @@ var AttendanceService = {
     }
     
     var attendanceRate = attendedCount / totalSessions;
-    var eligible = attendedCount >= (minAttendance || 10);
+    var eligible = attendedCount >= (minAttendance || 13);
     
     var updates = {
       "Total Attended": attendedCount,
@@ -570,7 +582,7 @@ var AttendanceService = {
         Attendance: settings.Attendance || "CLOSED",
         Quiz: settings.Quiz || "OPEN",
         Feedback: settings.Feedback || "OPEN",
-        MinAttendance: settings.MinAttendance || 10,
+        MinAttendance: settings.MinAttendance || 13,
         LogoURL: settings.LogoURL || "",
         FacebookURL: settings.FacebookURL || "https://www.facebook.com/profile.php?id=61575638669904",
         AdminPIN: settings.AdminPIN || "1234"

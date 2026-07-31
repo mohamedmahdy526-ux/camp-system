@@ -54,7 +54,7 @@ function getSettings() {
       Quiz: "OPEN",
       Feedback: "OPEN",
       FacebookURL: "https://www.facebook.com/profile.php?id=61575638669904",
-      MinAttendance: 10,
+      MinAttendance: 13,
       AdminPIN: "1234"
     };
     
