@@ -395,7 +395,17 @@ function setupSheets() {
     }
   }
   
-  return "تم تهيئة قاعدة البيانات بنجاح! تم إنشاء جدول إرشادي المحاضرات Sessions Guide.";
+  // 8. Certificate Earners Sheet
+  var certSheet = ss.getSheetByName("المستحقين للشهادات");
+  if (!certSheet) {
+    certSheet = ss.insertSheet("المستحقين للشهادات");
+  }
+  certSheet.clear();
+  certSheet.getRange("A1").setValue('=QUERY(Students!A:X, "SELECT A, B, C, D, E, V, W WHERE X = TRUE", 1)');
+  certSheet.getRange("A1:G1").setFontWeight("bold").setBackground("#10b981").setFontColor("#ffffff");
+  Logger.log("Created/Reset Certificate Earners sheet.");
+  
+  return "تم تهيئة قاعدة البيانات بنجاح! تم إنشاء جدول إرشادي المحاضرات وجدول المستحقين للشهادات.";
 }
 
 /**
