@@ -213,6 +213,9 @@ function setupSheets() {
   var settingsSheet = ss.getSheetByName(CONFIG.SHEET_SETTINGS);
   if (!settingsSheet) {
     settingsSheet = ss.insertSheet(CONFIG.SHEET_SETTINGS);
+  }
+  if (settingsSheet.getLastRow() <= 1) {
+    settingsSheet.clear();
     settingsSheet.appendRow(["Key", "Value"]);
     settingsSheet.appendRow(["CampName", "كامب الامتياز لطلاب التمريض - مبادرة ما ينفع الناس"]);
     settingsSheet.appendRow(["CurrentSession", "0"]); // Start with 0 (Orientation)
@@ -222,13 +225,25 @@ function setupSheets() {
     settingsSheet.appendRow(["AdminPIN", "1234"]);
     // Format headers
     settingsSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#cbd5e1");
-    Logger.log("Created Settings sheet.");
+    Logger.log("Created/Reset Settings sheet.");
   }
   
   // 2. Students Sheet
   var studentsSheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
   if (!studentsSheet) {
     studentsSheet = ss.insertSheet(CONFIG.SHEET_STUDENTS);
+  }
+  
+  var hasHeaders = false;
+  try {
+    var hdrs = DB.getHeaders(studentsSheet);
+    if (hdrs && hdrs.indexOf("Phone") !== -1) {
+      hasHeaders = true;
+    }
+  } catch(e) {}
+  
+  if (!hasHeaders || studentsSheet.getLastRow() <= 1) {
+    studentsSheet.clear();
     var headers = ["Phone", "Name AR", "Name EN", "University", "Email"];
     
     // Exact Session Titles mapped to columns S0 to S15
@@ -259,24 +274,30 @@ function setupSheets() {
     studentsSheet.appendRow(headers);
     // Format headers
     studentsSheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0f766e").setFontColor("#ffffff");
-    Logger.log("Created Students sheet.");
+    Logger.log("Created/Reset Students sheet.");
   }
   
   // 3. Attendance Log Sheet
   var logSheet = ss.getSheetByName(CONFIG.SHEET_LOG);
   if (!logSheet) {
     logSheet = ss.insertSheet(CONFIG.SHEET_LOG);
+  }
+  if (logSheet.getLastRow() <= 1) {
+    logSheet.clear();
     var logHeaders = ["Timestamp", "Phone", "Session"];
     logSheet.appendRow(logHeaders);
     // Format headers
     logSheet.getRange("A1:C1").setFontWeight("bold").setBackground("#4f46e5").setFontColor("#ffffff");
-    Logger.log("Created Attendance Log sheet.");
+    Logger.log("Created/Reset Attendance Log sheet.");
   }
   
   // 4. Session Info Metadata Sheet
   var infoSheet = ss.getSheetByName("Sessions Guide");
   if (!infoSheet) {
     infoSheet = ss.insertSheet("Sessions Guide");
+  }
+  if (infoSheet.getLastRow() <= 1) {
+    infoSheet.clear();
     infoSheet.appendRow(["Index", "Date & Day", "Time", "Module", "Session Topic", "Instructor"]);
     
     var sessionsGuideData = [
@@ -302,8 +323,8 @@ function setupSheets() {
       infoSheet.appendRow(sessionsGuideData[j]);
     }
     
-    infoSheet.getRange(1, 1, 1, 6).setFontWeight("bold").setBackground("#0891b2").setFontColor("#ffffff");
-    Logger.log("Created Sessions Guide sheet.");
+    infoSheet.getRange(1, 1, 1, 6).setFontWeight("bold").setBackground("#0284c7").setFontColor("#ffffff");
+    Logger.log("Created/Reset Sessions Guide sheet.");
   }
   
   // 5. Quiz Questions Sheet
