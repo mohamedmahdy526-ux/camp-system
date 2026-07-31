@@ -204,9 +204,9 @@ function submitFeedbackAnswers(phone, answers) {
  * Run this function once from the Apps Script editor to initialize sheets and headers.
  */
 function setupSheets() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getActiveSpreadsheet();
   if (!ss) {
-    throw new Error("Active spreadsheet not found. Make sure this script is bound to a Google Sheet.");
+    throw new Error("Active spreadsheet not found.");
   }
   
   // 1. Settings Sheet
@@ -441,7 +441,7 @@ function adminAdvanceSession() {
 }
 
 function setSettingValue(key, value) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getActiveSpreadsheet();
   var sheet = ss.getSheetByName(CONFIG.SHEET_SETTINGS);
   if (!sheet) throw new Error("Settings sheet not found.");
   

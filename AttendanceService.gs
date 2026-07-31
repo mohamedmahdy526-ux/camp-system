@@ -510,7 +510,7 @@ var AttendanceService = {
     var currentSession = settings.CurrentSession || "0";
     var sessionKey = this.getSessionKey(currentSession);
     
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     
     // 1. Calculate Registered Students and Attendees
     var studentSheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);

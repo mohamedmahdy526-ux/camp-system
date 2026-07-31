@@ -22,11 +22,18 @@ var CONFIG = {
  * 
  * @returns {object} Settings object.
  */
+/**
+ * Gets the active spreadsheet, falling back to a specific ID if necessary.
+ */
+function getActiveSpreadsheet() {
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
+
 function getSettings() {
   try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     if (!ss) {
-      throw new Error("Active spreadsheet not found. Ensure this script is bound to a Google Sheet.");
+      throw new Error("Active spreadsheet not found.");
     }
     
     var sheet = ss.getSheetByName(CONFIG.SHEET_SETTINGS);

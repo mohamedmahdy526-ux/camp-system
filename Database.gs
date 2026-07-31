@@ -52,7 +52,7 @@ var DB = {
    * @returns {object|null} Student data object or null.
    */
   getStudentByPhone: function(phone) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
     if (!sheet) throw new Error("Students sheet not found.");
     
@@ -75,7 +75,7 @@ var DB = {
    * @param {object} studentData Key-value representation of the student.
    */
   addStudent: function(studentData) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
     if (!sheet) throw new Error("Students sheet not found.");
     
@@ -115,7 +115,7 @@ var DB = {
    * @param {object} updatesMap Key-value pairs of headers to update.
    */
   updateStudentFields: function(phone, updatesMap) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
     if (!sheet) throw new Error("Students sheet not found.");
     
@@ -145,7 +145,7 @@ var DB = {
    * @param {string|number} session Session identifier.
    */
   logAttendance: function(phone, session) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_LOG);
     if (!sheet) throw new Error("Attendance Log sheet not found.");
     
@@ -174,7 +174,7 @@ var DB = {
    * @returns {Array} List of question objects.
    */
   getQuizQuestions: function(sessionIndex) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_QUIZ_QUESTIONS);
     if (!sheet) return [];
     
@@ -204,7 +204,7 @@ var DB = {
    * Saves a student's quiz score to the Quiz Grades sheet.
    */
   saveQuizGrade: function(phone, nameAr, nameEn, sessionIndex, score, totalQuestions) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_QUIZ_GRADES);
     if (!sheet) throw new Error("Quiz Grades sheet not found.");
     
@@ -238,7 +238,7 @@ var DB = {
    * Gets a student's quiz grade if they've taken it.
    */
   getQuizGrade: function(phone, sessionIndex) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_QUIZ_GRADES);
     if (!sheet) return null;
     
@@ -299,7 +299,7 @@ var DB = {
    * Saves a student's feedback response to the Feedback Responses sheet.
    */
   saveFeedbackResponse: function(phone, nameAr, sessionIndex, answers) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = this.checkAndCreateFeedbackSheet(ss);
     
     var headers = this.getHeaders(sheet);
@@ -333,7 +333,7 @@ var DB = {
    * Gets a student's feedback response if they've submitted it.
    */
   getFeedbackResponse: function(phone, sessionIndex) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = getActiveSpreadsheet();
     var sheet = this.checkAndCreateFeedbackSheet(ss);
     
     var lastRow = sheet.getLastRow();
