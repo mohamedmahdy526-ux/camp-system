@@ -861,6 +861,12 @@
   }
 
   function onFeedbackStatusLoaded(res) {
+    if (res && res.error) {
+      hideLoading();
+      showAlert("auth-alert", "خطأ في النظام: " + res.error, "danger");
+      return;
+    }
+
     if (res.status === "CLOSED") {
       hideLoading();
       showAlert("auth-alert", res.message, "warning");
