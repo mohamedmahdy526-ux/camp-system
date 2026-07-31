@@ -316,6 +316,13 @@
     badge.style.display = 'flex';
     badge.className = 'phone-status-badge';
     
+    if (res && res.error) {
+      currentPhoneStatus = "ERROR";
+      badge.classList.add('status-attended');
+      badge.innerHTML = "<span>⚠️</span><div>حدث خطأ في النظام: " + res.error + "</div>";
+      return;
+    }
+    
     var submitBtn = document.getElementById('btn-submit-attendance');
     submitBtn.disabled = false;
     submitBtn.style.display = 'block';
