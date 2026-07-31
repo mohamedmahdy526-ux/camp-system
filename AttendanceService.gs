@@ -310,11 +310,11 @@ var AttendanceService = {
     var student = DB.getStudentByPhone(phone);
     if (!student) return;
     
-    var totalSessions = 16; // 0 to 15
+    var totalSessions = 15; // S1 to S15 (S0 is excluded)
     var attendedCount = 0;
     
-    // Count True values across S0..S15
-    for (var i = 0; i < totalSessions; i++) {
+    // Count True values across S1..S15
+    for (var i = 1; i <= totalSessions; i++) {
       var sKey = this.getSessionKey(i);
       var val = student[sKey];
       if (val === true || val === "TRUE" || val === "true") {
@@ -322,12 +322,14 @@ var AttendanceService = {
       }
     }
     
-    var attendanceRate = attendedCount / totalSessions;
-    var eligible = attendedCount >= (minAttendance || 13);
+    var rateValue = totalSessions > 0 ? (attendedCount / totalSessions) : 0;
+    // Format as percentage string, e.g., "86.7%"
+    var attendanceRateStr = (rateValue * 100).toFixed(1) + "%";
+    var eligible = attendedCount >= (minAttendance || 12); // Default to 12 sessions (80% of 15 is 12)
     
     var updates = {
       "Total Attended": attendedCount,
-      "Attendance Rate": attendanceRate,
+      "Attendance Rate": attendanceRateStr,
       "Certificate Eligible": eligible
     };
     
@@ -582,7 +584,7 @@ var AttendanceService = {
         Attendance: settings.Attendance || "CLOSED",
         Quiz: settings.Quiz || "OPEN",
         Feedback: settings.Feedback || "OPEN",
-        MinAttendance: settings.MinAttendance || 13,
+        MinAttendance: settings.MinAttendance || 12,
         LogoURL: settings.LogoURL || "",
         FacebookURL: settings.FacebookURL || "https://www.facebook.com/profile.php?id=61575638669904",
         AdminPIN: settings.AdminPIN || "1234"
