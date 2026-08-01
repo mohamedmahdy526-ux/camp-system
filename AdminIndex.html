@@ -12,6 +12,7 @@
     <?!= include("AdminStyle"); ?>
   </head>
   <body>
+    <div id="toast-container" class="toast-container"></div>
     <div class="glow glow-1"></div>
     <div class="glow glow-2"></div>
 
@@ -65,23 +66,44 @@
 
         <div id="dashboard-alert"></div>
 
+        <!-- System Status Banner -->
+        <div class="system-status-banner">
+          <div class="current-session-label">
+            <span>📚 المحاضرة النشطة:</span>
+            <span id="status-current-session">-</span>
+          </div>
+          <div class="status-indicators">
+            <span id="status-badge-attendance" class="status-indicator closed">Attendance: CLOSED</span>
+            <span id="status-badge-quiz" class="status-indicator closed">Quiz: CLOSED</span>
+            <span id="status-badge-feedback" class="status-indicator closed">Feedback: CLOSED</span>
+          </div>
+        </div>
+
         <!-- Section: Statistics -->
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-num" id="stat-registered">-</div>
-            <div class="stat-label">المسجلين بالكامب</div>
+            <div class="stat-label">👥 المسجلين بالكامب</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-attendees">-</div>
-            <div class="stat-label">حضور المحاضرة</div>
+            <div class="stat-label">✅ حضور المحاضرة</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-quiz-takers">-</div>
-            <div class="stat-label">مؤدي الكويز</div>
+            <div class="stat-label">📝 كويزات مقدمة</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-quiz-avg">-</div>
-            <div class="stat-label">متوسط الدرجات</div>
+            <div class="stat-label">⭐ متوسط الكويز</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-feedback-takers">-</div>
+            <div class="stat-label">💬 استمارات التقييم</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-eligible">-</div>
+            <div class="stat-label">🎓 مستحقي الشهادة</div>
           </div>
         </div>
 

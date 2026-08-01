@@ -575,6 +575,55 @@ var AttendanceService = {
       }
     }
     
+    // 3. Calculate Feedback Takers
+    var feedbackSheet = ss.getSheetByName(CONFIG.SHEET_FEEDBACK_RESPONSES);
+    var currentSessionFeedbackTakers = 0;
+    if (feedbackSheet) {
+      var feedbackLastRow = feedbackSheet.getLastRow();
+      if (feedbackLastRow > 1) {
+        var feedbackHeaders = DB.getHeaders(feedbackSheet);
+        var feedbackData = feedbackSheet.getRange(2, 1, feedbackLastRow - 1, feedbackHeaders.length).getValues();
+        var targetFeedbackSess = (settings.FeedbackSession !== undefined && settings.FeedbackSession !== null) ? 
+                                  settings.FeedbackSession.toString().trim() : currentSession.toString().trim();
+        
+        for (var f = 0; f < feedbackData.length; f++) {
+          var rowSess = feedbackData[f][3].toString().trim(); // Session Index
+          if (rowSess === targetFeedbackSess) {
+            currentSessionFeedbackTakers++;
+          }
+        }
+      }
+    }
+    
+    // 4. Calculate Certificate Eligible Students
+    var certificateEligibleCount = 0;
+    var minAttendance = Number(settings.MinAttendance || 12);
+    if (studentSheet && totalRegistered > 0) {
+      var studentHeaders = DB.getHeaders(studentSheet);
+      var sessionColIndices = [];
+      for (var s = 1; s <= 15; s++) {
+        var sKey = "S" + s;
+        var idx = studentHeaders.indexOf(sKey);
+        if (idx !== -1) {
+          sessionColIndices.push(idx);
+        }
+      }
+      
+      var allStudentData = studentSheet.getRange(2, 1, studentLastRow - 1, studentHeaders.length).getValues();
+      for (var r = 0; r < allStudentData.length; r++) {
+        var attendedCount = 0;
+        for (var c = 0; c < sessionColIndices.length; c++) {
+          var val = allStudentData[r][sessionColIndices[c]];
+          if (val === true || val === "TRUE" || val === "true") {
+            attendedCount++;
+          }
+        }
+        if (attendedCount >= minAttendance) {
+          certificateEligibleCount++;
+        }
+      }
+    }
+    
     return {
       authorized: true,
       settings: {
@@ -593,7 +642,9 @@ var AttendanceService = {
         totalRegistered: totalRegistered,
         currentSessionAttendees: currentSessionAttendees,
         currentSessionQuizTakers: currentSessionQuizTakers,
-        averageQuizScore: averageQuizScore
+        averageQuizScore: averageQuizScore,
+        currentSessionFeedbackTakers: currentSessionFeedbackTakers,
+        certificateEligibleCount: certificateEligibleCount
       }
     };
   },

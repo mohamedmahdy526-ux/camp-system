@@ -190,12 +190,27 @@
     gap: 12px;
     margin-bottom: 20px;
   }
+  @media (min-width: 576px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (min-width: 992px) {
+    .stats-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
   .stat-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 16px 12px;
+    padding: 18px 12px;
     text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
   }
   .stat-num {
     font-size: 24px;
@@ -484,10 +499,106 @@
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
+
+  /* ================= SYSTEM STATUS BANNER ================= */
+  .system-status-banner {
+    background: rgba(4, 34, 31, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  
+  .status-indicators {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    direction: ltr;
+  }
+  
+  .status-indicator.open {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  
+  .status-indicator.closed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+  
+  .current-session-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  /* ================= TOAST NOTIFICATIONS ================= */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+  
+  .toast-msg {
+    background: rgba(9, 9, 11, 0.9);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    pointer-events: auto;
+  }
+  
+  .toast-msg.toast-success {
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  
+  .toast-msg.toast-success::before {
+    content: '🟢';
+  }
+  
+  @keyframes toastSlideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 </style>
 
   </head>
   <body>
+    <div id="toast-container" class="toast-container"></div>
     <div class="glow glow-1"></div>
     <div class="glow glow-2"></div>
 
@@ -541,23 +652,44 @@
 
         <div id="dashboard-alert"></div>
 
+        <!-- System Status Banner -->
+        <div class="system-status-banner">
+          <div class="current-session-label">
+            <span>📚 المحاضرة النشطة:</span>
+            <span id="status-current-session">-</span>
+          </div>
+          <div class="status-indicators">
+            <span id="status-badge-attendance" class="status-indicator closed">Attendance: CLOSED</span>
+            <span id="status-badge-quiz" class="status-indicator closed">Quiz: CLOSED</span>
+            <span id="status-badge-feedback" class="status-indicator closed">Feedback: CLOSED</span>
+          </div>
+        </div>
+
         <!-- Section: Statistics -->
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-num" id="stat-registered">-</div>
-            <div class="stat-label">المسجلين بالكامب</div>
+            <div class="stat-label">👥 المسجلين بالكامب</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-attendees">-</div>
-            <div class="stat-label">حضور المحاضرة</div>
+            <div class="stat-label">✅ حضور المحاضرة</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-quiz-takers">-</div>
-            <div class="stat-label">مؤدي الكويز</div>
+            <div class="stat-label">📝 كويزات مقدمة</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-quiz-avg">-</div>
-            <div class="stat-label">متوسط الدرجات</div>
+            <div class="stat-label">⭐ متوسط الكويز</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-feedback-takers">-</div>
+            <div class="stat-label">💬 استمارات التقييم</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-eligible">-</div>
+            <div class="stat-label">🎓 مستحقي الشهادة</div>
           </div>
         </div>
 
@@ -699,6 +831,7 @@
     stats: {},
     logoUrl: ""
   };
+  var isDataLoading = false;
 
   var sessionsGuideList = [
     "التمهيد والترحيب (Opening & Orientation)",
@@ -755,12 +888,35 @@
           totalRegistered: 154,
           currentSessionAttendees: 89,
           currentSessionQuizTakers: 42,
-          averageQuizScore: 8.5
+          averageQuizScore: 8.5,
+          currentSessionFeedbackTakers: 35,
+          certificateEligibleCount: 97
         }
       };
     }
     if (action === "updateAdminSettings") {
-      return { success: true };
+      return {
+        success: true,
+        settings: {
+          CampName: args[1].CampName || "مبادرة ما ينفع الناس - كامب التمريض",
+          CurrentSession: args[1].CurrentSession || "0",
+          MinAttendance: args[1].MinAttendance || 5,
+          Attendance: args[1].Attendance || "OPEN",
+          Quiz: args[1].Quiz || "CLOSED",
+          Feedback: args[1].Feedback || "CLOSED",
+          LogoURL: args[1].LogoURL || "",
+          FacebookURL: args[1].FacebookURL || "https://www.facebook.com/maynfa3.alnas",
+          FeedbackSession: args[1].FeedbackSession || "0"
+        },
+        stats: {
+          totalRegistered: 154,
+          currentSessionAttendees: 89,
+          currentSessionQuizTakers: 42,
+          averageQuizScore: 8.5,
+          currentSessionFeedbackTakers: 35,
+          certificateEligibleCount: 97
+        }
+      };
     }
     return { error: "Unknown mock action" };
   }
@@ -810,6 +966,7 @@
   function initAdminApp() {
     clearAlerts();
     populateSessionDropdown();
+    setupAutoSaveListeners();
 
     // Load public settings first to show logo and name on login screen
     showLoading("جاري تحميل إعدادات النظام...");
@@ -940,11 +1097,21 @@
     state.stats = res.stats;
     state.logoUrl = normalizeLogoUrl(res.settings.LogoURL);
 
+    isDataLoading = true;
+
     // Update UI Stats
     document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
     document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
     document.getElementById("stat-quiz-takers").textContent = res.stats.currentSessionQuizTakers;
-    document.getElementById("stat-quiz-avg").textContent = res.stats.averageQuizScore + " / 10";
+    
+    var avgNum = parseFloat(res.stats.averageQuizScore);
+    document.getElementById("stat-quiz-avg").textContent = isNaN(avgNum) || avgNum <= 0 ? "0%" : (avgNum * 10).toFixed(0) + "%";
+    
+    document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
+    document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
+
+    // Update System Status Banner
+    updateStatusBadges();
 
     // Update UI Form fields
     document.getElementById("admin-camp-title").textContent = res.settings.CampName;
@@ -960,6 +1127,8 @@
     document.getElementById("input-admin-logo-url").value = res.settings.LogoURL || "";
     document.getElementById("input-admin-facebook-url").value = res.settings.FacebookURL || "";
     document.getElementById("input-admin-new-pin").value = "";
+
+    isDataLoading = false;
 
     // Update Logos
     var logos = document.querySelectorAll('.dynamic-logo-img');
@@ -1190,6 +1359,133 @@
     containers.forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.innerHTML = '';
+    });
+  }
+
+  /* ================= AUTO-SAVE AND TOAST FUNCTIONS ================= */
+  function showToast(message, type) {
+    var container = document.getElementById("toast-container");
+    if (!container) return;
+    
+    var toast = document.createElement("div");
+    toast.className = "toast-msg toast-" + (type || "success");
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    setTimeout(function() {
+      toast.style.animation = "toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) reverse";
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+
+  function updateStatusBadges() {
+    var currentSessionName = getSessionName(state.config.CurrentSession);
+    document.getElementById("status-current-session").textContent = currentSessionName;
+    
+    var attendanceBadge = document.getElementById("status-badge-attendance");
+    if (state.config.Attendance === "OPEN") {
+      attendanceBadge.className = "status-indicator open";
+      attendanceBadge.textContent = "Attendance: OPEN";
+    } else {
+      attendanceBadge.className = "status-indicator closed";
+      attendanceBadge.textContent = "Attendance: CLOSED";
+    }
+    
+    var quizBadge = document.getElementById("status-badge-quiz");
+    if (state.config.Quiz === "OPEN") {
+      quizBadge.className = "status-indicator open";
+      quizBadge.textContent = "Quiz: OPEN";
+    } else {
+      quizBadge.className = "status-indicator closed";
+      quizBadge.textContent = "Quiz: CLOSED";
+    }
+    
+    var feedbackBadge = document.getElementById("status-badge-feedback");
+    if (state.config.Feedback === "OPEN") {
+      feedbackBadge.className = "status-indicator open";
+      feedbackBadge.textContent = "Feedback: OPEN";
+    } else {
+      feedbackBadge.className = "status-indicator closed";
+      feedbackBadge.textContent = "Feedback: CLOSED";
+    }
+  }
+
+  function setupAutoSaveListeners() {
+    document.getElementById("toggle-attendance-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("toggle-quiz-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("toggle-feedback-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("select-admin-session").addEventListener("change", function() {
+      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚");
+    });
+    
+    document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
+      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝");
+    });
+  }
+
+  function autoSaveDashboardSettings(toastMessage) {
+    if (isDataLoading) return;
+    
+    var sessionVal = document.getElementById("select-admin-session").value;
+    var feedbackSessionVal = document.getElementById("select-admin-feedback-session").value;
+    var attendanceOpen = document.getElementById("toggle-attendance-status").checked ? "OPEN" : "CLOSED";
+    var quizOpen = document.getElementById("toggle-quiz-status").checked ? "OPEN" : "CLOSED";
+    var feedbackOpen = document.getElementById("toggle-feedback-status").checked ? "OPEN" : "CLOSED";
+    var campNameVal = document.getElementById("input-admin-camp-name").value.trim();
+    var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
+    var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
+    var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
+    
+    var updates = {
+      CurrentSession: sessionVal,
+      FeedbackSession: feedbackSessionVal,
+      Attendance: attendanceOpen,
+      Quiz: quizOpen,
+      Feedback: feedbackOpen,
+      CampName: campNameVal,
+      MinAttendance: minAttendance,
+      LogoURL: logoUrlVal,
+      FacebookURL: facebookUrlVal
+    };
+    
+    callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
+      isDataLoading = true;
+      state.config = res.settings;
+      state.stats = res.stats;
+      
+      updateStatusBadges();
+      
+      document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
+      document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
+      document.getElementById("stat-quiz-takers").textContent = res.stats.currentSessionQuizTakers;
+      
+      var avgNum = parseFloat(res.stats.averageQuizScore);
+      document.getElementById("stat-quiz-avg").textContent = isNaN(avgNum) || avgNum <= 0 ? "0%" : (avgNum * 10).toFixed(0) + "%";
+      
+      document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
+      document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
+      
+      isDataLoading = false;
+      
+      showToast(toastMessage || "تم حفظ التغييرات تلقائياً! 🟢", "success");
+    }, function(err) {
+      console.error("Auto-save failed:", err);
+      showToast("فشل الحفظ التلقائي: " + err.message, "danger");
     });
   }
 </script>

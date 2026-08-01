@@ -6,6 +6,7 @@
     stats: {},
     logoUrl: ""
   };
+  var isDataLoading = false;
 
   var sessionsGuideList = [
     "التمهيد والترحيب (Opening & Orientation)",
@@ -62,12 +63,35 @@
           totalRegistered: 154,
           currentSessionAttendees: 89,
           currentSessionQuizTakers: 42,
-          averageQuizScore: 8.5
+          averageQuizScore: 8.5,
+          currentSessionFeedbackTakers: 35,
+          certificateEligibleCount: 97
         }
       };
     }
     if (action === "updateAdminSettings") {
-      return { success: true };
+      return {
+        success: true,
+        settings: {
+          CampName: args[1].CampName || "مبادرة ما ينفع الناس - كامب التمريض",
+          CurrentSession: args[1].CurrentSession || "0",
+          MinAttendance: args[1].MinAttendance || 5,
+          Attendance: args[1].Attendance || "OPEN",
+          Quiz: args[1].Quiz || "CLOSED",
+          Feedback: args[1].Feedback || "CLOSED",
+          LogoURL: args[1].LogoURL || "",
+          FacebookURL: args[1].FacebookURL || "https://www.facebook.com/maynfa3.alnas",
+          FeedbackSession: args[1].FeedbackSession || "0"
+        },
+        stats: {
+          totalRegistered: 154,
+          currentSessionAttendees: 89,
+          currentSessionQuizTakers: 42,
+          averageQuizScore: 8.5,
+          currentSessionFeedbackTakers: 35,
+          certificateEligibleCount: 97
+        }
+      };
     }
     return { error: "Unknown mock action" };
   }
@@ -117,6 +141,7 @@
   function initAdminApp() {
     clearAlerts();
     populateSessionDropdown();
+    setupAutoSaveListeners();
 
     // Load public settings first to show logo and name on login screen
     showLoading("جاري تحميل إعدادات النظام...");
@@ -247,11 +272,21 @@
     state.stats = res.stats;
     state.logoUrl = normalizeLogoUrl(res.settings.LogoURL);
 
+    isDataLoading = true;
+
     // Update UI Stats
     document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
     document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
     document.getElementById("stat-quiz-takers").textContent = res.stats.currentSessionQuizTakers;
-    document.getElementById("stat-quiz-avg").textContent = res.stats.averageQuizScore + " / 10";
+    
+    var avgNum = parseFloat(res.stats.averageQuizScore);
+    document.getElementById("stat-quiz-avg").textContent = isNaN(avgNum) || avgNum <= 0 ? "0%" : (avgNum * 10).toFixed(0) + "%";
+    
+    document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
+    document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
+
+    // Update System Status Banner
+    updateStatusBadges();
 
     // Update UI Form fields
     document.getElementById("admin-camp-title").textContent = res.settings.CampName;
@@ -267,6 +302,8 @@
     document.getElementById("input-admin-logo-url").value = res.settings.LogoURL || "";
     document.getElementById("input-admin-facebook-url").value = res.settings.FacebookURL || "";
     document.getElementById("input-admin-new-pin").value = "";
+
+    isDataLoading = false;
 
     // Update Logos
     var logos = document.querySelectorAll('.dynamic-logo-img');
@@ -497,6 +534,133 @@
     containers.forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.innerHTML = '';
+    });
+  }
+
+  /* ================= AUTO-SAVE AND TOAST FUNCTIONS ================= */
+  function showToast(message, type) {
+    var container = document.getElementById("toast-container");
+    if (!container) return;
+    
+    var toast = document.createElement("div");
+    toast.className = "toast-msg toast-" + (type || "success");
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    setTimeout(function() {
+      toast.style.animation = "toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) reverse";
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+
+  function updateStatusBadges() {
+    var currentSessionName = getSessionName(state.config.CurrentSession);
+    document.getElementById("status-current-session").textContent = currentSessionName;
+    
+    var attendanceBadge = document.getElementById("status-badge-attendance");
+    if (state.config.Attendance === "OPEN") {
+      attendanceBadge.className = "status-indicator open";
+      attendanceBadge.textContent = "Attendance: OPEN";
+    } else {
+      attendanceBadge.className = "status-indicator closed";
+      attendanceBadge.textContent = "Attendance: CLOSED";
+    }
+    
+    var quizBadge = document.getElementById("status-badge-quiz");
+    if (state.config.Quiz === "OPEN") {
+      quizBadge.className = "status-indicator open";
+      quizBadge.textContent = "Quiz: OPEN";
+    } else {
+      quizBadge.className = "status-indicator closed";
+      quizBadge.textContent = "Quiz: CLOSED";
+    }
+    
+    var feedbackBadge = document.getElementById("status-badge-feedback");
+    if (state.config.Feedback === "OPEN") {
+      feedbackBadge.className = "status-indicator open";
+      feedbackBadge.textContent = "Feedback: OPEN";
+    } else {
+      feedbackBadge.className = "status-indicator closed";
+      feedbackBadge.textContent = "Feedback: CLOSED";
+    }
+  }
+
+  function setupAutoSaveListeners() {
+    document.getElementById("toggle-attendance-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("toggle-quiz-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("toggle-feedback-status").addEventListener("change", function() {
+      var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
+      autoSaveDashboardSettings(msg);
+    });
+    
+    document.getElementById("select-admin-session").addEventListener("change", function() {
+      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚");
+    });
+    
+    document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
+      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝");
+    });
+  }
+
+  function autoSaveDashboardSettings(toastMessage) {
+    if (isDataLoading) return;
+    
+    var sessionVal = document.getElementById("select-admin-session").value;
+    var feedbackSessionVal = document.getElementById("select-admin-feedback-session").value;
+    var attendanceOpen = document.getElementById("toggle-attendance-status").checked ? "OPEN" : "CLOSED";
+    var quizOpen = document.getElementById("toggle-quiz-status").checked ? "OPEN" : "CLOSED";
+    var feedbackOpen = document.getElementById("toggle-feedback-status").checked ? "OPEN" : "CLOSED";
+    var campNameVal = document.getElementById("input-admin-camp-name").value.trim();
+    var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
+    var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
+    var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
+    
+    var updates = {
+      CurrentSession: sessionVal,
+      FeedbackSession: feedbackSessionVal,
+      Attendance: attendanceOpen,
+      Quiz: quizOpen,
+      Feedback: feedbackOpen,
+      CampName: campNameVal,
+      MinAttendance: minAttendance,
+      LogoURL: logoUrlVal,
+      FacebookURL: facebookUrlVal
+    };
+    
+    callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
+      isDataLoading = true;
+      state.config = res.settings;
+      state.stats = res.stats;
+      
+      updateStatusBadges();
+      
+      document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
+      document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
+      document.getElementById("stat-quiz-takers").textContent = res.stats.currentSessionQuizTakers;
+      
+      var avgNum = parseFloat(res.stats.averageQuizScore);
+      document.getElementById("stat-quiz-avg").textContent = isNaN(avgNum) || avgNum <= 0 ? "0%" : (avgNum * 10).toFixed(0) + "%";
+      
+      document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
+      document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
+      
+      isDataLoading = false;
+      
+      showToast(toastMessage || "تم حفظ التغييرات تلقائياً! 🟢", "success");
+    }, function(err) {
+      console.error("Auto-save failed:", err);
+      showToast("فشل الحفظ التلقائي: " + err.message, "danger");
     });
   }
 </script>
