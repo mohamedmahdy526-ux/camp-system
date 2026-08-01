@@ -770,6 +770,13 @@
         سيعاد توجيهك تلقائياً خلال <span id="success-timer" style="color: var(--accent); font-weight: bold;">6</span> ثوانٍ...
       </div>
 
+      <!-- Feedback Evaluation Link -->
+      <div id="attendance-success-feedback-container" style="margin-top: 15px; display: none;">
+        <a id="btn-go-to-feedback" href="#" class="btn btn-accent" style="width: 100%; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>📝</span> تقييم المحاضرة الحالية
+        </a>
+      </div>
+
       <button onclick="closeModal('modal-success')" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">
         العودة للرئيسية يدوياً 🔙
       </button>
@@ -900,6 +907,7 @@
     state.campName = settings.CampName;
     state.session = settings.CurrentSession;
     state.isClosed = settings.Attendance.toString().toUpperCase() !== "OPEN";
+    state.feedbackOpen = settings.Feedback.toString().toUpperCase() === "OPEN";
     state.logoUrl = normalizeLogoUrl(settings.LogoURL);
 
     // Update Facebook Links
@@ -1334,6 +1342,17 @@
 
     document.getElementById('success-student-name').textContent = res.studentName;
     document.getElementById('success-session-info').textContent = "تم تسجيل حضورك بنجاح في: " + getSessionDisplayName(res.session);
+    
+    var feedbackContainer = document.getElementById('attendance-success-feedback-container');
+    if (state.feedbackOpen) {
+      var baseUrl = window.location.href.split('?')[0];
+      var feedbackUrl = baseUrl + "?page=feedback&phone=" + encodeURIComponent(state.phone || "");
+      document.getElementById('btn-go-to-feedback').href = feedbackUrl;
+      feedbackContainer.style.display = 'block';
+    } else {
+      feedbackContainer.style.display = 'none';
+    }
+    
     showModal('modal-success');
 
     startRedirectTimer();

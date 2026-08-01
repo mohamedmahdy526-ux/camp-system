@@ -20,6 +20,7 @@ function doGet(e) {
       .addMetaTag("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
   } else if (page === "feedback") {
     var template = HtmlService.createTemplateFromFile("FeedbackIndex");
+    template.phone = (e && e.parameter && e.parameter.phone) ? e.parameter.phone.toString() : "";
     return template.evaluate()
       .setTitle("استطلاع الرأي والتقييم - مبادرة ما ينفع الناس")
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
