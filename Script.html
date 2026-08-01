@@ -527,15 +527,7 @@
     document.getElementById('success-student-name').textContent = res.studentName;
     document.getElementById('success-session-info').textContent = "تم تسجيل حضورك بنجاح في: " + getSessionDisplayName(res.session);
     
-    var feedbackContainer = document.getElementById('attendance-success-feedback-container');
-    if (state.feedbackOpen) {
-      var baseUrl = window.location.href.split('?')[0];
-      var feedbackUrl = baseUrl + "?page=feedback&phone=" + encodeURIComponent(state.phone || "");
-      document.getElementById('btn-go-to-feedback').href = feedbackUrl;
-      feedbackContainer.style.display = 'block';
-    } else {
-      feedbackContainer.style.display = 'none';
-    }
+
     
     showModal('modal-success');
 
