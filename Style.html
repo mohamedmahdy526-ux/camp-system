@@ -557,4 +557,98 @@
       height: 12px;
     }
   }
+
+  /* Popups/Modals */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(1, 19, 18, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 420px;
+    padding: 35px 25px;
+    text-align: center;
+    position: relative;
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+
+  .success-icon-container {
+    width: 80px;
+    height: 80px;
+    background: rgba(197, 160, 89, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+  }
+
+  .success-icon {
+    font-size: 40px;
+    color: var(--accent);
+    font-weight: bold;
+    line-height: 80px;
+  }
+
+  .success-message {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 10px 0 5px;
+  }
+
+  .success-message-sub {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Extra mobile optimization to fit small screens */
+  @media(max-height: 600px) {
+    .modal-card {
+      padding: 20px 20px;
+    }
+    .success-icon-container {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+    .success-icon {
+      font-size: 30px;
+      line-height: 60px;
+    }
+  }
 </style>

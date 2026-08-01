@@ -508,32 +508,35 @@
   function onAttendanceRegistered(res) {
     hideLoading();
     if (res.error) {
-      showAlert('alert-phone', res.error, 'danger');
+      document.getElementById('error-message-text').textContent = res.error;
+      showModal('modal-error');
       return;
     }
 
     if (res.alreadyMarked) {
       document.getElementById('already-student-name').textContent = res.studentName;
       document.getElementById('already-session').textContent = getSessionDisplayName(res.session);
-      showScreen('screen-already-attended');
+      showModal('modal-already-attended');
       return;
     }
 
     document.getElementById('success-student-name').textContent = res.studentName;
     document.getElementById('success-session-info').textContent = "تم تسجيل حضورك بنجاح في: " + getSessionDisplayName(res.session);
-    showScreen('screen-success');
+    showModal('modal-success');
 
     startRedirectTimer();
   }
 
   function onAttendanceError(err) {
     hideLoading();
-    showAlert('alert-phone', "فشل تسجيل الحضور: " + err.message, 'danger');
+    document.getElementById('error-message-text').textContent = "فشل تسجيل الحضور: " + err.message;
+    showModal('modal-error');
   }
 
   function onRegisterError(err) {
     hideLoading();
-    showAlert('alert-phone', "فشل تسجيل البيانات: " + err.message, 'danger');
+    document.getElementById('error-message-text').textContent = "فشل تسجيل البيانات: " + err.message;
+    showModal('modal-error');
   }
 
   var timerId = null;
@@ -543,6 +546,12 @@
       timerId = null;
     }
     
+    // Close all modals
+    var modals = document.querySelectorAll('.modal-overlay');
+    modals.forEach(function(m) {
+      m.classList.remove('active');
+    });
+
     document.getElementById('input-phone').value = '';
     resetFormFieldsState();
     
@@ -569,5 +578,22 @@
         resetFlow();
       }
     }, 1000);
+  }
+
+  function showModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  function closeModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.remove('active');
+    }
+    if (id === 'modal-success' || id === 'modal-already-attended') {
+      resetFlow();
+    }
   }
 </script>

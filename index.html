@@ -568,6 +568,100 @@
       height: 12px;
     }
   }
+
+  /* Popups/Modals */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(1, 19, 18, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 420px;
+    padding: 35px 25px;
+    text-align: center;
+    position: relative;
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+
+  .success-icon-container {
+    width: 80px;
+    height: 80px;
+    background: rgba(197, 160, 89, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+  }
+
+  .success-icon {
+    font-size: 40px;
+    color: var(--accent);
+    font-weight: bold;
+    line-height: 80px;
+  }
+
+  .success-message {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 10px 0 5px;
+  }
+
+  .success-message-sub {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Extra mobile optimization to fit small screens */
+  @media(max-height: 600px) {
+    .modal-card {
+      padding: 20px 20px;
+    }
+    .success-icon-container {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+    .success-icon {
+      font-size: 30px;
+      line-height: 60px;
+    }
+  }
 </style>
 
 </head>
@@ -648,102 +742,67 @@
 
         <!-- Social Media Footer -->
         <div class="social-footer" style="margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; font-weight: bold;">تابع صفحة مبادرة ما ينفع الناس الرسمية على فيسبوك:</div>
-          <div style="display: flex; justify-content: center;">
-            <a href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank" class="social-link facebook-link facebook-link-href" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #1877f2; text-decoration: none; font-weight: bold; background: rgba(24, 119, 242, 0.1); padding: 10px 24px; border-radius: 30px; transition: 0.2s; border: 1px solid rgba(24, 119, 242, 0.2);">
-              <span>🔵</span> صفحة فيسبوك الرسمية (Facebook)
-            </a>
-          </div>
+          <a class="social-link facebook-link-href" href="https://www.facebook.com/profile.php?id=61575638669904" target="_blank">
+            تابعونا على فيسبوك 👍
+          </a>
         </div>
-      </div>
-
-      <!-- ================= SCREEN: ALREADY ATTENDED ================= -->
-      <div id="screen-already-attended" class="screen">
-        <div class="header">
-          <div class="brand-logo-container">
-            <span class="brand-logo-text-fallback">🤝</span>
-            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.style.display='none'" alt="Logo">
-          </div>
-          <h1 class="camp-title-styled">
-            <svg class="heartbeat-svg heartbeat-left" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="title-internship">INTERNSHIP</span>
-            <span class="title-camp">CAMP</span>
-            <svg class="heartbeat-svg heartbeat-right" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </h1>
-          <div class="camp-subtitle dynamic-camp-subtitle">الكامب التدريبي</div>
-          <span class="session-badge dynamic-session-badge">المحاضرة</span>
-        </div>
-
-        <div class="alert alert-warning" style="margin-bottom: 30px;">
-          <span>🔔</span>
-          <div>
-            مرحباً <strong id="already-student-name">..</strong>، لقد قمت بتسجيل حضورك بالفعل في <strong>المحاضرة <span id="already-session">..</span></strong> سابقاً.
-          </div>
-        </div>
-
-        <button type="button" onclick="resetFlow()" class="btn btn-primary">تسجيل طالب آخر</button>
-      </div>
-
-      <!-- ================= SCREEN: SUCCESS ================= -->
-      <div id="screen-success" class="screen">
-        <div class="success-badge">✓</div>
-        <h2 class="success-title">تم بنجاح!</h2>
-        
-        <p class="success-text">
-          مرحباً <strong id="success-student-name">..</strong><br>
-          <span id="success-session-info">تم تسجيل حضورك بنجاح.</span>
-        </p>
-
-        <div class="alert alert-info" style="justify-content: center; font-size: 13px; padding: 12px;">
-          سيتم تحويلك تلقائياً للرئيسية بعد <strong id="success-timer" style="margin: 0 4px; color: var(--primary);">6</strong> ثوانٍ
-        </div>
-
-        <button type="button" onclick="resetFlow()" class="btn btn-secondary">العودة الآن</button>
-      </div>
-
-      <!-- ================= SCREEN: ATTENDANCE CLOSED ================= -->
-      <div id="screen-closed" class="screen">
-        <div class="header">
-          <div class="brand-logo-container">
-            <span class="brand-logo-text-fallback">🤝</span>
-            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.style.display='none'" alt="Logo">
-          </div>
-          <h1 class="camp-title-styled">
-            <svg class="heartbeat-svg heartbeat-left" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="title-internship">INTERNSHIP</span>
-            <span class="title-camp">CAMP</span>
-            <svg class="heartbeat-svg heartbeat-right" viewBox="0 0 36 20"><path d="M 0 10 L 12 10 L 14 5 L 16 15 L 18 0 L 20 20 L 22 10 L 24 10 L 36 10" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </h1>
-          <div class="camp-subtitle dynamic-camp-subtitle">Nursing Internship Camp</div>
-        </div>
-
-        <div class="alert alert-danger" style="margin-bottom: 30px; text-align: center; justify-content: center;">
-          <span>🔒</span>
-          <div>تسجيل الحضور مغلق حالياً. يرجى مراجعة إدارة الكامب.</div>
-        </div>
-
-        <button type="button" onclick="resetFlow()" class="btn btn-secondary">تحديث الصفحة</button>
-      </div>
-
-      <!-- ================= SCREEN: GLOBAL SYSTEM ERROR ================= -->
-      <div id="screen-global-error" class="screen">
-        <div class="header">
-          <div class="brand-logo-container">
-            <span class="brand-logo-text-fallback">🤝</span>
-            <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.style.display='none'" alt="Logo">
-          </div>
-          <h2 class="camp-title">خطأ في النظام</h2>
-        </div>
-
-        <div id="alert-global"></div>
-
-        <button type="button" onclick="resetFlow()" class="btn btn-primary">إعادة المحاولة</button>
       </div>
 
     </div>
   </div>
 
-  <!-- Inject Custom Script -->
+  <!-- ================= POPUP MODALS ================= -->
+  <!-- Success Modal -->
+  <div id="modal-success" class="modal-overlay">
+    <div class="modal-card">
+      <div class="success-icon-container">
+        <div class="success-icon">✓</div>
+      </div>
+      <h2 class="success-title">تم تسجيل الحضور بنجاح!</h2>
+      <p class="success-message" id="success-student-name">-</p>
+      <p class="success-message-sub" id="success-session-info">تم التحضير للمحاضرة بنجاح.</p>
+      
+      <div class="redirect-info" style="margin-top: 25px; font-size: 13px; color: var(--text-muted);">
+        سيعاد توجيهك تلقائياً خلال <span id="success-timer" style="color: var(--accent); font-weight: bold;">6</span> ثوانٍ...
+      </div>
+
+      <button onclick="closeModal('modal-success')" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">
+        العودة للرئيسية يدوياً 🔙
+      </button>
+    </div>
+  </div>
+
+  <!-- Already Attended Modal -->
+  <div id="modal-already-attended" class="modal-overlay">
+    <div class="modal-card">
+      <div class="success-icon-container" style="background: rgba(197, 160, 89, 0.1); border-color: rgba(197, 160, 89, 0.3);">
+        <div class="success-icon" style="color: var(--accent);">✓</div>
+      </div>
+      <h2 class="success-title" style="color: var(--accent);">مسجل حضورك مسبقاً!</h2>
+      <p class="success-message" id="already-student-name">-</p>
+      <p class="success-message-sub">أنت مسجل حضور بالفعل في <span id="already-session" style="color: var(--accent); font-weight: bold;">-</span>.</p>
+      
+      <button onclick="closeModal('modal-already-attended')" class="btn btn-primary" style="margin-top: 30px; width: 100%;">
+        تسجيل حضور طالب آخر 👥
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div id="modal-error" class="modal-overlay">
+    <div class="modal-card">
+      <div class="success-icon-container" style="background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.3);">
+        <div class="success-icon" style="color: var(--danger);">✕</div>
+      </div>
+      <h2 class="success-title" style="color: var(--danger);">فشل عملية التسجيل</h2>
+      <p class="success-message-sub" id="error-message-text" style="font-size: 15px; margin-top: 10px; color: var(--text-main); font-weight: 500;">-</p>
+      
+      <button onclick="closeModal('modal-error')" class="btn btn-secondary" style="margin-top: 25px; width: 100%;">
+        إغلاق ومحاولة أخرى 🔄
+      </button>
+    </div>
+  </div>
+
   <script>
   // Application State
   var state = {
@@ -1062,6 +1121,13 @@
     badge.style.display = 'flex';
     badge.className = 'phone-status-badge';
     
+    if (res && res.error) {
+      currentPhoneStatus = "ERROR";
+      badge.classList.add('status-attended');
+      badge.innerHTML = "<span>⚠️</span><div>حدث خطأ في النظام: " + res.error + "</div>";
+      return;
+    }
+    
     var submitBtn = document.getElementById('btn-submit-attendance');
     submitBtn.disabled = false;
     submitBtn.style.display = 'block';
@@ -1247,32 +1313,35 @@
   function onAttendanceRegistered(res) {
     hideLoading();
     if (res.error) {
-      showAlert('alert-phone', res.error, 'danger');
+      document.getElementById('error-message-text').textContent = res.error;
+      showModal('modal-error');
       return;
     }
 
     if (res.alreadyMarked) {
       document.getElementById('already-student-name').textContent = res.studentName;
       document.getElementById('already-session').textContent = getSessionDisplayName(res.session);
-      showScreen('screen-already-attended');
+      showModal('modal-already-attended');
       return;
     }
 
     document.getElementById('success-student-name').textContent = res.studentName;
     document.getElementById('success-session-info').textContent = "تم تسجيل حضورك بنجاح في: " + getSessionDisplayName(res.session);
-    showScreen('screen-success');
+    showModal('modal-success');
 
     startRedirectTimer();
   }
 
   function onAttendanceError(err) {
     hideLoading();
-    showAlert('alert-phone', "فشل تسجيل الحضور: " + err.message, 'danger');
+    document.getElementById('error-message-text').textContent = "فشل تسجيل الحضور: " + err.message;
+    showModal('modal-error');
   }
 
   function onRegisterError(err) {
     hideLoading();
-    showAlert('alert-phone', "فشل تسجيل البيانات: " + err.message, 'danger');
+    document.getElementById('error-message-text').textContent = "فشل تسجيل البيانات: " + err.message;
+    showModal('modal-error');
   }
 
   var timerId = null;
@@ -1282,6 +1351,12 @@
       timerId = null;
     }
     
+    // Close all modals
+    var modals = document.querySelectorAll('.modal-overlay');
+    modals.forEach(function(m) {
+      m.classList.remove('active');
+    });
+
     document.getElementById('input-phone').value = '';
     resetFormFieldsState();
     
@@ -1308,6 +1383,23 @@
         resetFlow();
       }
     }, 1000);
+  }
+
+  function showModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  function closeModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.remove('active');
+    }
+    if (id === 'modal-success' || id === 'modal-already-attended') {
+      resetFlow();
+    }
   }
 </script>
 
