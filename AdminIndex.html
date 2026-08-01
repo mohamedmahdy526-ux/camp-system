@@ -66,52 +66,136 @@
 
         <div id="dashboard-alert"></div>
 
-        <!-- System Status Banner -->
-        <div class="system-status-banner">
-          <div class="current-session-label">
-            <span>📚 المحاضرة النشطة:</span>
-            <span id="status-current-session">-</span>
+        <!-- Tabs Navigation -->
+        <div class="tab-nav">
+          <button id="tab-btn-dashboard" class="tab-btn active" onclick="switchTab('dashboard')">📊 الرئيسية</button>
+          <button id="tab-btn-settings" class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات</button>
+          <button id="tab-btn-links" class="tab-btn" onclick="switchTab('links')">🔗 الروابط</button>
+        </div>
+
+        <!-- ================= TAB CONTENT: DASHBOARD ================= -->
+        <div id="tab-content-dashboard" class="tab-content active">
+          <!-- System Status Banner -->
+          <div class="system-status-banner">
+            <div class="current-session-label">
+              <span>📚 المحاضرة النشطة:</span>
+              <span id="status-current-session">-</span>
+            </div>
+            <div class="status-indicators">
+              <span id="status-badge-attendance" class="status-indicator closed">Attendance</span>
+              <span id="status-badge-quiz" class="status-indicator closed">Quiz</span>
+              <span id="status-badge-feedback" class="status-indicator closed">Feedback</span>
+            </div>
           </div>
-          <div class="status-indicators">
-            <span id="status-badge-attendance" class="status-indicator closed">Attendance: CLOSED</span>
-            <span id="status-badge-quiz" class="status-indicator closed">Quiz: CLOSED</span>
-            <span id="status-badge-feedback" class="status-indicator closed">Feedback: CLOSED</span>
+
+          <!-- Section: Statistics -->
+          <div class="stats-grid">
+            <div class="stat-card stat-card-wide">
+              <div class="stat-num" id="stat-registered">-</div>
+              <div class="stat-label">👥 الطلاب المسجلين بالكامب</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-attendees">-</div>
+              <div class="stat-label">✅ حضور المحاضرة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-quiz-takers">-</div>
+              <div class="stat-label">📝 كويزات مقدمة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-quiz-avg">-</div>
+              <div class="stat-label">⭐ متوسط الكويز</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-feedback-takers">-</div>
+              <div class="stat-label">💬 استمارات التقييم</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-eligible">-</div>
+              <div class="stat-label">🎓 مستحقي الشهادة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Grid -->
+          <div class="quick-actions-title">⚡ الإجراءات السريعة</div>
+          <div class="quick-actions-grid">
+            <button id="qa-btn-attendance" onclick="toggleQuickAction('attendance')" class="quick-action-btn qa-closed">
+              <span>Attendance</span>
+              <span class="qa-status" id="qa-status-attendance">CLOSED 🔴</span>
+            </button>
+            <button id="qa-btn-quiz" onclick="toggleQuickAction('quiz')" class="quick-action-btn qa-closed">
+              <span>Quiz</span>
+              <span class="qa-status" id="qa-status-quiz">CLOSED 🔴</span>
+            </button>
+            <button id="qa-btn-feedback" onclick="toggleQuickAction('feedback')" class="quick-action-btn qa-closed">
+              <span>Feedback</span>
+              <span class="qa-status" id="qa-status-feedback">CLOSED 🔴</span>
+            </button>
+            <button onclick="copyQuickAttendanceLink()" class="quick-action-btn qa-link">
+              <span>رابط التحضير</span>
+              <span class="qa-status">📋 نسخ الرابط</span>
+            </button>
+          </div>
+
+          <!-- Main Dashboard Content Grid -->
+          <div class="dashboard-grid-container" style="margin-top: 0; display: grid; gap: 20px;">
+            <!-- Session Info Card -->
+            <div class="session-info-card">
+              <h3 class="session-info-title">تفاصيل المحاضرة النشطة 📚</h3>
+              <div class="session-info-grid">
+                <div class="session-info-row">
+                  <span>عنوان المحاضرة:</span>
+                  <span class="session-info-val" id="sess-info-topic">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>المحاضر:</span>
+                  <span class="session-info-val" id="sess-info-instructor">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>اليوم والتاريخ:</span>
+                  <span class="session-info-val" id="sess-info-day">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>الوقت والمدة:</span>
+                  <span class="session-info-val" id="sess-info-time">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- System Health & Sync Status Card -->
+            <div class="health-card">
+              <div class="health-status-header">
+                <button onclick="silentRefresh()" class="health-refresh-btn" id="health-refresh-btn" title="تحديث البيانات">↻</button>
+                <div class="health-title-row" id="health-title-row">
+                  <span>System Healthy</span>
+                  <span>🟢</span>
+                </div>
+              </div>
+              <div class="health-detail-row">
+                <span>حالة الحفظ:</span>
+                <span class="health-detail-val" id="health-save-status">✓ كل التغييرات محفوظة</span>
+              </div>
+              <div class="health-detail-row">
+                <span>آخر مزامنة:</span>
+                <span class="health-detail-val" id="health-last-sync">-</span>
+              </div>
+              <div class="health-detail-row">
+                <span>آخر عملية:</span>
+                <span class="health-detail-val" id="health-last-op">System Loaded</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Section: Statistics -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-num" id="stat-registered">-</div>
-            <div class="stat-label">👥 المسجلين بالكامب</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-attendees">-</div>
-            <div class="stat-label">✅ حضور المحاضرة</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-quiz-takers">-</div>
-            <div class="stat-label">📝 كويزات مقدمة</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-quiz-avg">-</div>
-            <div class="stat-label">⭐ متوسط الكويز</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-feedback-takers">-</div>
-            <div class="stat-label">💬 استمارات التقييم</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-eligible">-</div>
-            <div class="stat-label">🎓 مستحقي الشهادة</div>
-          </div>
-        </div>
-
-        <!-- Main Dashboard Content Grid -->
-        <div class="dashboard-grid-container">
-          
-          <!-- Section: Configuration Form -->
-          <div class="admin-card">
+        <!-- ================= TAB CONTENT: SETTINGS ================= -->
+        <div id="tab-content-settings" class="tab-content">
+          <div class="admin-card" style="margin-top: 0;">
             <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
             
             <div class="form-group">
@@ -126,39 +210,6 @@
               <select id="select-admin-feedback-session" class="form-select">
                 <!-- Dynamically populated options S0..S15 -->
               </select>
-            </div>
-
-            <div class="toggle-group">
-              <div>
-                <div class="toggle-title">تسجيل الحضور والتحضير</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية التحضير للطلاب</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-attendance-status">
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="toggle-group" style="margin-top: 15px;">
-              <div>
-                <div class="toggle-title">تفعيل الكويز التفاعلي</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-quiz-status">
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="toggle-group" style="margin-top: 15px;">
-              <div>
-                <div class="toggle-title">تفعيل استطلاع الرأي والتقييم</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-feedback-status">
-                <span class="slider round"></span>
-              </label>
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
@@ -185,41 +236,55 @@
               <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
               <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
             </div>
-
-            <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
-              حفظ التغييرات وتعميمها 💾
-            </button>
+            
+            <!-- Hidden inputs to keep bindings intact -->
+            <input type="checkbox" id="toggle-attendance-status" style="display:none;">
+            <input type="checkbox" id="toggle-quiz-status" style="display:none;">
+            <input type="checkbox" id="toggle-feedback-status" style="display:none;">
           </div>
+        </div>
 
-          <!-- Section: Links & Announcements -->
-          <div class="admin-card">
+        <!-- ================= TAB CONTENT: LINKS ================= -->
+        <div id="tab-content-links" class="tab-content">
+          <div class="admin-card" style="margin-top: 0;">
             <h3 class="card-title">روابط النشر والإعلان 🔗</h3>
 
-            <div class="link-item">
-              <div class="link-label">رابط تسجيل الحضور للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-attendance-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-attendance-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">تسجيل الحضور والتحضير</div>
+                <div class="link-row-desc">رابط الحضور العام للطلاب في المحاضرة النشطة</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-attendance-url">
+                <button onclick="copyToClipboard('link-attendance-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-attendance-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
 
-            <div class="link-item">
-              <div class="link-label">رابط الكويز المخصص للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-quiz-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-quiz-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">كويز المحاضرة</div>
+                <div class="link-row-desc">رابط الكويز المخصص للطلاب لحل الأسئلة</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-quiz-url">
+                <button onclick="copyToClipboard('link-quiz-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-quiz-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
 
-            <div class="link-item">
-              <div class="link-label">رابط استطلاع الرأي المخصص للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-feedback-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-feedback-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">تقييم واستبيان المحاضرة</div>
+                <div class="link-row-desc">رابط تقييم المحاضر واستبيان الرأي اليومي</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-feedback-url">
+                <button onclick="copyToClipboard('link-feedback-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-feedback-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
           </div>
-          
         </div>
       </div>
     </div>

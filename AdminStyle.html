@@ -583,4 +583,323 @@
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+
+  /* ================= TABS NAVIGATION ================= */
+  .tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 22px;
+    gap: 8px;
+    direction: rtl;
+  }
+  
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .tab-btn:hover {
+    color: var(--text-primary);
+  }
+  
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ================= STAT CARD SPECIFICS ================= */
+  .stat-card.stat-card-wide {
+    grid-column: span 2;
+    background: rgba(197, 160, 89, 0.05);
+    border-color: rgba(197, 160, 89, 0.4);
+  }
+  @media (min-width: 576px) {
+    .stat-card.stat-card-wide {
+      grid-column: span 3;
+    }
+  }
+  @media (min-width: 992px) {
+    .stat-card.stat-card-wide {
+      grid-column: span 2;
+    }
+  }
+  
+  .stat-num {
+    margin-bottom: 6px;
+  }
+  
+  .stat-subtext {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: normal;
+  }
+
+  /* ================= QUICK ACTIONS GRID ================= */
+  .quick-actions-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: right;
+    color: var(--text-secondary);
+  }
+  
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  @media (min-width: 768px) {
+    .quick-actions-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .quick-action-btn {
+    padding: 14px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-primary);
+  }
+  
+  .quick-action-btn.qa-open {
+    background: rgba(16, 185, 129, 0.08);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  
+  .quick-action-btn.qa-closed {
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  
+  .quick-action-btn.qa-link {
+    background: rgba(197, 160, 89, 0.08);
+    color: var(--primary-hover);
+    border-color: rgba(197, 160, 89, 0.3);
+  }
+  
+  .quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .quick-action-btn .qa-status {
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: 600;
+  }
+
+  /* ================= SESSION INFO CARD ================= */
+  .session-info-card {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: right;
+  }
+  
+  .session-info-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+    border-right: 3px solid var(--primary);
+    padding-right: 8px;
+  }
+  
+  .session-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+  
+  .session-info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .session-info-val {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ================= SYSTEM HEALTH CARD ================= */
+  .health-card {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: right;
+  }
+  
+  .health-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .health-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #34d399; /* Green for healthy */
+  }
+  
+  .health-title-row.failed {
+    color: #f87171; /* Red for error */
+  }
+  
+  .health-refresh-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background: rgba(197, 160, 89, 0.1);
+  }
+  
+  .health-refresh-btn:hover {
+    background: rgba(197, 160, 89, 0.2);
+    transform: rotate(180deg);
+  }
+  
+  .health-refresh-btn.spinning {
+    animation: spin 1s linear infinite;
+  }
+  
+  .health-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+    padding: 8px 0;
+  }
+  
+  .health-detail-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .health-detail-val {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ================= PUBLISH LINKS TAB ================= */
+  .link-row-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .link-row-info {
+    text-align: right;
+  }
+  
+  .link-row-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  .link-row-desc {
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  
+  .link-row-actions {
+    display: flex;
+    gap: 8px;
+    direction: ltr;
+  }
+  
+  .btn-link-action {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-link-copy {
+    background: var(--primary);
+    color: #053733;
+  }
+  
+  .btn-link-copy:hover {
+    background: var(--primary-hover);
+  }
+  
+  .btn-link-open {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-link-open:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 </style>

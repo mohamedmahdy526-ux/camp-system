@@ -594,6 +594,325 @@
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+
+  /* ================= TABS NAVIGATION ================= */
+  .tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 22px;
+    gap: 8px;
+    direction: rtl;
+  }
+  
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .tab-btn:hover {
+    color: var(--text-primary);
+  }
+  
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ================= STAT CARD SPECIFICS ================= */
+  .stat-card.stat-card-wide {
+    grid-column: span 2;
+    background: rgba(197, 160, 89, 0.05);
+    border-color: rgba(197, 160, 89, 0.4);
+  }
+  @media (min-width: 576px) {
+    .stat-card.stat-card-wide {
+      grid-column: span 3;
+    }
+  }
+  @media (min-width: 992px) {
+    .stat-card.stat-card-wide {
+      grid-column: span 2;
+    }
+  }
+  
+  .stat-num {
+    margin-bottom: 6px;
+  }
+  
+  .stat-subtext {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: normal;
+  }
+
+  /* ================= QUICK ACTIONS GRID ================= */
+  .quick-actions-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: right;
+    color: var(--text-secondary);
+  }
+  
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  @media (min-width: 768px) {
+    .quick-actions-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .quick-action-btn {
+    padding: 14px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-primary);
+  }
+  
+  .quick-action-btn.qa-open {
+    background: rgba(16, 185, 129, 0.08);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  
+  .quick-action-btn.qa-closed {
+    background: rgba(239, 68, 68, 0.08);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  
+  .quick-action-btn.qa-link {
+    background: rgba(197, 160, 89, 0.08);
+    color: var(--primary-hover);
+    border-color: rgba(197, 160, 89, 0.3);
+  }
+  
+  .quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .quick-action-btn .qa-status {
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: 600;
+  }
+
+  /* ================= SESSION INFO CARD ================= */
+  .session-info-card {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: right;
+  }
+  
+  .session-info-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+    border-right: 3px solid var(--primary);
+    padding-right: 8px;
+  }
+  
+  .session-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+  
+  .session-info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .session-info-val {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ================= SYSTEM HEALTH CARD ================= */
+  .health-card {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: right;
+  }
+  
+  .health-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .health-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #34d399; /* Green for healthy */
+  }
+  
+  .health-title-row.failed {
+    color: #f87171; /* Red for error */
+  }
+  
+  .health-refresh-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background: rgba(197, 160, 89, 0.1);
+  }
+  
+  .health-refresh-btn:hover {
+    background: rgba(197, 160, 89, 0.2);
+    transform: rotate(180deg);
+  }
+  
+  .health-refresh-btn.spinning {
+    animation: spin 1s linear infinite;
+  }
+  
+  .health-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+    padding: 8px 0;
+  }
+  
+  .health-detail-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .health-detail-val {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ================= PUBLISH LINKS TAB ================= */
+  .link-row-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .link-row-info {
+    text-align: right;
+  }
+  
+  .link-row-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  .link-row-desc {
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  
+  .link-row-actions {
+    display: flex;
+    gap: 8px;
+    direction: ltr;
+  }
+  
+  .btn-link-action {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-link-copy {
+    background: var(--primary);
+    color: #053733;
+  }
+  
+  .btn-link-copy:hover {
+    background: var(--primary-hover);
+  }
+  
+  .btn-link-open {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-link-open:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 </style>
 
   </head>
@@ -652,52 +971,136 @@
 
         <div id="dashboard-alert"></div>
 
-        <!-- System Status Banner -->
-        <div class="system-status-banner">
-          <div class="current-session-label">
-            <span>📚 المحاضرة النشطة:</span>
-            <span id="status-current-session">-</span>
+        <!-- Tabs Navigation -->
+        <div class="tab-nav">
+          <button id="tab-btn-dashboard" class="tab-btn active" onclick="switchTab('dashboard')">📊 الرئيسية</button>
+          <button id="tab-btn-settings" class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات</button>
+          <button id="tab-btn-links" class="tab-btn" onclick="switchTab('links')">🔗 الروابط</button>
+        </div>
+
+        <!-- ================= TAB CONTENT: DASHBOARD ================= -->
+        <div id="tab-content-dashboard" class="tab-content active">
+          <!-- System Status Banner -->
+          <div class="system-status-banner">
+            <div class="current-session-label">
+              <span>📚 المحاضرة النشطة:</span>
+              <span id="status-current-session">-</span>
+            </div>
+            <div class="status-indicators">
+              <span id="status-badge-attendance" class="status-indicator closed">Attendance</span>
+              <span id="status-badge-quiz" class="status-indicator closed">Quiz</span>
+              <span id="status-badge-feedback" class="status-indicator closed">Feedback</span>
+            </div>
           </div>
-          <div class="status-indicators">
-            <span id="status-badge-attendance" class="status-indicator closed">Attendance: CLOSED</span>
-            <span id="status-badge-quiz" class="status-indicator closed">Quiz: CLOSED</span>
-            <span id="status-badge-feedback" class="status-indicator closed">Feedback: CLOSED</span>
+
+          <!-- Section: Statistics -->
+          <div class="stats-grid">
+            <div class="stat-card stat-card-wide">
+              <div class="stat-num" id="stat-registered">-</div>
+              <div class="stat-label">👥 الطلاب المسجلين بالكامب</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-attendees">-</div>
+              <div class="stat-label">✅ حضور المحاضرة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-quiz-takers">-</div>
+              <div class="stat-label">📝 كويزات مقدمة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-quiz-avg">-</div>
+              <div class="stat-label">⭐ متوسط الكويز</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-feedback-takers">-</div>
+              <div class="stat-label">💬 استمارات التقييم</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num" id="stat-eligible">-</div>
+              <div class="stat-label">🎓 مستحقي الشهادة</div>
+              <div class="stat-subtext">تحديث تلقائي</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Grid -->
+          <div class="quick-actions-title">⚡ الإجراءات السريعة</div>
+          <div class="quick-actions-grid">
+            <button id="qa-btn-attendance" onclick="toggleQuickAction('attendance')" class="quick-action-btn qa-closed">
+              <span>Attendance</span>
+              <span class="qa-status" id="qa-status-attendance">CLOSED 🔴</span>
+            </button>
+            <button id="qa-btn-quiz" onclick="toggleQuickAction('quiz')" class="quick-action-btn qa-closed">
+              <span>Quiz</span>
+              <span class="qa-status" id="qa-status-quiz">CLOSED 🔴</span>
+            </button>
+            <button id="qa-btn-feedback" onclick="toggleQuickAction('feedback')" class="quick-action-btn qa-closed">
+              <span>Feedback</span>
+              <span class="qa-status" id="qa-status-feedback">CLOSED 🔴</span>
+            </button>
+            <button onclick="copyQuickAttendanceLink()" class="quick-action-btn qa-link">
+              <span>رابط التحضير</span>
+              <span class="qa-status">📋 نسخ الرابط</span>
+            </button>
+          </div>
+
+          <!-- Main Dashboard Content Grid -->
+          <div class="dashboard-grid-container" style="margin-top: 0; display: grid; gap: 20px;">
+            <!-- Session Info Card -->
+            <div class="session-info-card">
+              <h3 class="session-info-title">تفاصيل المحاضرة النشطة 📚</h3>
+              <div class="session-info-grid">
+                <div class="session-info-row">
+                  <span>عنوان المحاضرة:</span>
+                  <span class="session-info-val" id="sess-info-topic">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>المحاضر:</span>
+                  <span class="session-info-val" id="sess-info-instructor">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>اليوم والتاريخ:</span>
+                  <span class="session-info-val" id="sess-info-day">-</span>
+                </div>
+                <div class="session-info-row">
+                  <span>الوقت والمدة:</span>
+                  <span class="session-info-val" id="sess-info-time">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- System Health & Sync Status Card -->
+            <div class="health-card">
+              <div class="health-status-header">
+                <button onclick="silentRefresh()" class="health-refresh-btn" id="health-refresh-btn" title="تحديث البيانات">↻</button>
+                <div class="health-title-row" id="health-title-row">
+                  <span>System Healthy</span>
+                  <span>🟢</span>
+                </div>
+              </div>
+              <div class="health-detail-row">
+                <span>حالة الحفظ:</span>
+                <span class="health-detail-val" id="health-save-status">✓ كل التغييرات محفوظة</span>
+              </div>
+              <div class="health-detail-row">
+                <span>آخر مزامنة:</span>
+                <span class="health-detail-val" id="health-last-sync">-</span>
+              </div>
+              <div class="health-detail-row">
+                <span>آخر عملية:</span>
+                <span class="health-detail-val" id="health-last-op">System Loaded</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Section: Statistics -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-num" id="stat-registered">-</div>
-            <div class="stat-label">👥 المسجلين بالكامب</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-attendees">-</div>
-            <div class="stat-label">✅ حضور المحاضرة</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-quiz-takers">-</div>
-            <div class="stat-label">📝 كويزات مقدمة</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-quiz-avg">-</div>
-            <div class="stat-label">⭐ متوسط الكويز</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-feedback-takers">-</div>
-            <div class="stat-label">💬 استمارات التقييم</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-eligible">-</div>
-            <div class="stat-label">🎓 مستحقي الشهادة</div>
-          </div>
-        </div>
-
-        <!-- Main Dashboard Content Grid -->
-        <div class="dashboard-grid-container">
-          
-          <!-- Section: Configuration Form -->
-          <div class="admin-card">
+        <!-- ================= TAB CONTENT: SETTINGS ================= -->
+        <div id="tab-content-settings" class="tab-content">
+          <div class="admin-card" style="margin-top: 0;">
             <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
             
             <div class="form-group">
@@ -712,39 +1115,6 @@
               <select id="select-admin-feedback-session" class="form-select">
                 <!-- Dynamically populated options S0..S15 -->
               </select>
-            </div>
-
-            <div class="toggle-group">
-              <div>
-                <div class="toggle-title">تسجيل الحضور والتحضير</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية التحضير للطلاب</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-attendance-status">
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="toggle-group" style="margin-top: 15px;">
-              <div>
-                <div class="toggle-title">تفعيل الكويز التفاعلي</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-quiz-status">
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="toggle-group" style="margin-top: 15px;">
-              <div>
-                <div class="toggle-title">تفعيل استطلاع الرأي والتقييم</div>
-                <div class="toggle-desc">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggle-feedback-status">
-                <span class="slider round"></span>
-              </label>
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
@@ -771,41 +1141,55 @@
               <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
               <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
             </div>
-
-            <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
-              حفظ التغييرات وتعميمها 💾
-            </button>
+            
+            <!-- Hidden inputs to keep bindings intact -->
+            <input type="checkbox" id="toggle-attendance-status" style="display:none;">
+            <input type="checkbox" id="toggle-quiz-status" style="display:none;">
+            <input type="checkbox" id="toggle-feedback-status" style="display:none;">
           </div>
+        </div>
 
-          <!-- Section: Links & Announcements -->
-          <div class="admin-card">
+        <!-- ================= TAB CONTENT: LINKS ================= -->
+        <div id="tab-content-links" class="tab-content">
+          <div class="admin-card" style="margin-top: 0;">
             <h3 class="card-title">روابط النشر والإعلان 🔗</h3>
 
-            <div class="link-item">
-              <div class="link-label">رابط تسجيل الحضور للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-attendance-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-attendance-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">تسجيل الحضور والتحضير</div>
+                <div class="link-row-desc">رابط الحضور العام للطلاب في المحاضرة النشطة</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-attendance-url">
+                <button onclick="copyToClipboard('link-attendance-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-attendance-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
 
-            <div class="link-item">
-              <div class="link-label">رابط الكويز المخصص للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-quiz-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-quiz-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">كويز المحاضرة</div>
+                <div class="link-row-desc">رابط الكويز المخصص للطلاب لحل الأسئلة</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-quiz-url">
+                <button onclick="copyToClipboard('link-quiz-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-quiz-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
 
-            <div class="link-item">
-              <div class="link-label">رابط استطلاع الرأي المخصص للطلاب:</div>
-              <div class="link-row">
-                <input type="text" id="link-feedback-url" readonly class="form-input link-readonly">
-                <button onclick="copyToClipboard('link-feedback-url')" class="btn btn-secondary">نسخ</button>
+            <div class="link-row-card">
+              <div class="link-row-info">
+                <div class="link-row-title">تقييم واستبيان المحاضرة</div>
+                <div class="link-row-desc">رابط تقييم المحاضر واستبيان الرأي اليومي</div>
+              </div>
+              <div class="link-row-actions">
+                <input type="hidden" id="link-feedback-url">
+                <button onclick="copyToClipboard('link-feedback-url')" class="btn-link-action btn-link-copy">📋 Copy</button>
+                <button onclick="openLink('link-feedback-url')" class="btn-link-action btn-link-open">🌍 Open</button>
               </div>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -891,7 +1275,13 @@
           averageQuizScore: 8.5,
           currentSessionFeedbackTakers: 35,
           certificateEligibleCount: 97
-        }
+        },
+        sessions: [
+          { "Index": "0", "Session Topic": "التمهيد والترحيب (Opening & Orientation)", "Instructor": "Dr. Mohamed Mansour", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "1", "Session Topic": "Interview Skills & CV Writing", "Instructor": "Dr. Ali Abdelfatah", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "2", "Session Topic": "Professional Autonomy", "Instructor": "Dr. Mohamed Elbehairy", "Date & Day": "السبت", "Time": "6:00 PM" }
+        ],
+        serverTime: "2026-08-01T14:40:00"
       };
     }
     if (action === "updateAdminSettings") {
@@ -915,7 +1305,13 @@
           averageQuizScore: 8.5,
           currentSessionFeedbackTakers: 35,
           certificateEligibleCount: 97
-        }
+        },
+        sessions: [
+          { "Index": "0", "Session Topic": "التمهيد والترحيب (Opening & Orientation)", "Instructor": "Dr. Mohamed Mansour", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "1", "Session Topic": "Interview Skills & CV Writing", "Instructor": "Dr. Ali Abdelfatah", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "2", "Session Topic": "Professional Autonomy", "Instructor": "Dr. Mohamed Elbehairy", "Date & Day": "السبت", "Time": "6:00 PM" }
+        ],
+        serverTime: "2026-08-01T14:40:00"
       };
     }
     return { error: "Unknown mock action" };
@@ -967,6 +1363,7 @@
     clearAlerts();
     populateSessionDropdown();
     setupAutoSaveListeners();
+    setupTextAutoSaveListeners();
 
     // Load public settings first to show logo and name on login screen
     showLoading("جاري تحميل إعدادات النظام...");
@@ -1095,6 +1492,7 @@
 
     state.config = res.settings;
     state.stats = res.stats;
+    state.sessions = res.sessions || [];
     state.logoUrl = normalizeLogoUrl(res.settings.LogoURL);
 
     isDataLoading = true;
@@ -1110,8 +1508,24 @@
     document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
     document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
 
-    // Update System Status Banner
+    // Update System Status Banner & Quick Actions Toggles
     updateStatusBadges();
+    updateQuickActionButtonsStyle();
+    renderActiveSessionInfo();
+
+    // Set Last Sync time
+    var syncTimeStr = "";
+    if (res.serverTime) {
+      var tParts = res.serverTime.split("T");
+      if (tParts.length > 1) {
+        syncTimeStr = tParts[1];
+      } else {
+        syncTimeStr = formatTimestamp(new Date());
+      }
+    } else {
+      syncTimeStr = formatTimestamp(new Date());
+    }
+    document.getElementById("health-last-sync").textContent = syncTimeStr;
 
     // Update UI Form fields
     document.getElementById("admin-camp-title").textContent = res.settings.CampName;
@@ -1416,30 +1830,36 @@
   function setupAutoSaveListeners() {
     document.getElementById("toggle-attendance-status").addEventListener("change", function() {
       var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Attendance Opened" : "Attendance Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("toggle-quiz-status").addEventListener("change", function() {
       var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Quiz Opened" : "Quiz Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("toggle-feedback-status").addEventListener("change", function() {
       var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Feedback Opened" : "Feedback Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("select-admin-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚");
+      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚", "Session Changed");
     });
     
     document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝");
+      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝", "Feedback Session Changed");
     });
   }
 
-  function autoSaveDashboardSettings(toastMessage) {
+  function autoSaveDashboardSettings(toastMessage, opName) {
     if (isDataLoading) return;
+    
+    var saveStatus = document.getElementById("health-save-status");
+    if (saveStatus) saveStatus.textContent = "Saving...";
     
     var sessionVal = document.getElementById("select-admin-session").value;
     var feedbackSessionVal = document.getElementById("select-admin-feedback-session").value;
@@ -1450,6 +1870,7 @@
     var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
     var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
     var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
+    var newPinVal = document.getElementById("input-admin-new-pin").value.trim();
     
     var updates = {
       CurrentSession: sessionVal,
@@ -1463,12 +1884,28 @@
       FacebookURL: facebookUrlVal
     };
     
+    if (newPinVal) {
+      updates.AdminPIN = newPinVal;
+    }
+    
     callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
       isDataLoading = true;
       state.config = res.settings;
       state.stats = res.stats;
+      if (res.sessions) {
+        state.sessions = res.sessions;
+      }
+      
+      // Update stored PIN if it was successfully changed
+      if (newPinVal) {
+        state.pin = newPinVal;
+        sessionStorage.setItem("admin_pin", newPinVal);
+        document.getElementById("input-admin-new-pin").value = "";
+      }
       
       updateStatusBadges();
+      updateQuickActionButtonsStyle();
+      renderActiveSessionInfo();
       
       document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
       document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
@@ -1482,10 +1919,240 @@
       
       isDataLoading = false;
       
+      if (saveStatus) saveStatus.textContent = "✓ كل التغييرات محفوظة";
+      
+      updateHealthStatus(true);
+      
+      var syncTimeStr = "";
+      if (res.serverTime) {
+        var tParts = res.serverTime.split("T");
+        if (tParts.length > 1) {
+          syncTimeStr = tParts[1];
+        } else {
+          syncTimeStr = formatTimestamp(new Date());
+        }
+      } else {
+        syncTimeStr = formatTimestamp(new Date());
+      }
+      document.getElementById("health-last-sync").textContent = syncTimeStr;
+      
+      var finalOp = opName || "Settings Saved";
+      updateLastOperation(finalOp, new Date());
+      
       showToast(toastMessage || "تم حفظ التغييرات تلقائياً! 🟢", "success");
     }, function(err) {
       console.error("Auto-save failed:", err);
+      if (saveStatus) saveStatus.textContent = "فشل الحفظ ❌";
+      updateHealthStatus(false);
       showToast("فشل الحفظ التلقائي: " + err.message, "danger");
+    });
+  }
+
+  /* ================= PHASE 2 NEW HELPER FUNCTIONS ================= */
+  function switchTab(tabId) {
+    var buttons = document.querySelectorAll(".tab-btn");
+    buttons.forEach(function(btn) {
+      btn.classList.remove("active");
+    });
+    document.getElementById("tab-btn-" + tabId).classList.add("active");
+    
+    var contents = document.querySelectorAll(".tab-content");
+    contents.forEach(function(content) {
+      content.classList.remove("active");
+    });
+    document.getElementById("tab-content-" + tabId).classList.add("active");
+  }
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (state.sessions && state.sessions.length > 0) {
+      var sess = state.sessions.find(function(s) {
+        return parseInt(s["Index"], 10) === idx;
+      });
+      if (sess) {
+        return "S" + idx + ": " + (sess["Session Topic"] || sess["Module"] || "");
+      }
+    }
+    
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return "S" + idx + ": " + sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  function renderActiveSessionInfo() {
+    var selectSess = document.getElementById("select-admin-session");
+    if (!selectSess) return;
+    var activeVal = selectSess.value.toString().trim();
+    var activeIdx = parseInt(activeVal, 10);
+    
+    var sessTopic = document.getElementById("sess-info-topic");
+    var sessInstructor = document.getElementById("sess-info-instructor");
+    var sessDay = document.getElementById("sess-info-day");
+    var sessTime = document.getElementById("sess-info-time");
+    
+    if (!sessTopic) return;
+    
+    if (state.sessions && state.sessions.length > 0) {
+      var sess = state.sessions.find(function(s) {
+        return parseInt(s["Index"], 10) === activeIdx;
+      });
+      if (sess) {
+        sessTopic.textContent = sess["Session Topic"] || sess["Module"] || "-";
+        sessInstructor.textContent = sess["Instructor"] || "-";
+        sessDay.textContent = sess["Date & Day"] || "-";
+        sessTime.textContent = sess["Time"] || "-";
+        return;
+      }
+    }
+    
+    sessTopic.textContent = "المحاضرة " + activeVal;
+    sessInstructor.textContent = "-";
+    sessDay.textContent = "-";
+    sessTime.textContent = "-";
+  }
+
+  function updateQuickActionButtonsStyle() {
+    var qaAttendance = document.getElementById("qa-btn-attendance");
+    var qaQuiz = document.getElementById("qa-btn-quiz");
+    var qaFeedback = document.getElementById("qa-btn-feedback");
+    
+    if (!qaAttendance) return;
+    
+    if (state.config.Attendance === "OPEN") {
+      qaAttendance.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-attendance").textContent = "OPEN 🟢";
+    } else {
+      qaAttendance.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-attendance").textContent = "CLOSED 🔴";
+    }
+    
+    if (state.config.Quiz === "OPEN") {
+      qaQuiz.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-quiz").textContent = "OPEN 🟢";
+    } else {
+      qaQuiz.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-quiz").textContent = "CLOSED 🔴";
+    }
+    
+    if (state.config.Feedback === "OPEN") {
+      qaFeedback.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-feedback").textContent = "OPEN 🟢";
+    } else {
+      qaFeedback.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-feedback").textContent = "CLOSED 🔴";
+    }
+  }
+
+  function toggleQuickAction(type) {
+    var chk = document.getElementById("toggle-" + type + "-status");
+    if (chk) {
+      chk.checked = !chk.checked;
+      chk.dispatchEvent(new Event("change"));
+    }
+  }
+
+  function copyQuickAttendanceLink() {
+    copyToClipboard('link-attendance-url');
+  }
+
+  function openLink(elementId) {
+    var urlInput = document.getElementById(elementId);
+    if (urlInput && urlInput.value) {
+      window.open(urlInput.value, "_blank");
+    }
+  }
+
+  function silentRefresh() {
+    var refreshBtn = document.getElementById("health-refresh-btn");
+    if (refreshBtn) refreshBtn.classList.add("spinning");
+    
+    updateLastOperation("Refreshing Data", new Date());
+    
+    callServerOption("getAdminDashboardData", [state.pin], function(res) {
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      
+      if (res.error) {
+        updateHealthStatus(false);
+        showToast("فشل تحديث البيانات: " + res.error, "danger");
+        return;
+      }
+      
+      onDashboardDataLoaded(res);
+      updateHealthStatus(true);
+      updateLastOperation("Refresh Completed", new Date());
+      showToast("تم تحديث البيانات بنجاح ↻", "success");
+    }, function(err) {
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      updateHealthStatus(false);
+      showToast("فشل تحديث البيانات: " + err.message, "danger");
+    });
+  }
+
+  function formatTimestamp(dateObj) {
+    var hours = dateObj.getHours();
+    var minutes = dateObj.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return (hours < 10 ? '0' + hours : hours) + ':' + minutes + ' ' + ampm;
+  }
+
+  function updateHealthStatus(isHealthy) {
+    var healthRow = document.getElementById("health-title-row");
+    if (!healthRow) return;
+    if (isHealthy) {
+      healthRow.className = "health-title-row";
+      healthRow.innerHTML = "<span>System Healthy</span><span>🟢</span>";
+    } else {
+      healthRow.className = "health-title-row failed";
+      healthRow.innerHTML = "<span>Sync Failed</span><span>🔴</span>";
+    }
+  }
+
+  function updateLastOperation(opName, dateObj) {
+    var lastOp = document.getElementById("health-last-op");
+    if (lastOp) {
+      lastOp.textContent = opName + " (" + formatTimestamp(dateObj) + ")";
+    }
+  }
+
+  function setupTextAutoSaveListeners() {
+    var textInputs = [
+      { id: "input-admin-camp-name", key: "CampName", label: "اسم الكامب" },
+      { id: "input-admin-min-attendance", key: "MinAttendance", label: "الحد الأدنى للحضور" },
+      { id: "input-admin-logo-url", key: "LogoURL", label: "لوجو الكامب" },
+      { id: "input-admin-facebook-url", key: "FacebookURL", label: "رابط الفيسبوك" },
+      { id: "input-admin-new-pin", key: "AdminPIN", label: "رمز التحقق" }
+    ];
+    
+    textInputs.forEach(function(item) {
+      var inputEl = document.getElementById(item.id);
+      if (!inputEl) return;
+      
+      function handleSave() {
+        if (isDataLoading) return;
+        var val = inputEl.value.trim();
+        var oldVal = (state.config[item.key] !== undefined ? state.config[item.key].toString().trim() : "");
+        
+        if (item.key === "MinAttendance") {
+          val = Number(val);
+          oldVal = Number(oldVal);
+        }
+        
+        if (val !== oldVal && (item.key !== "AdminPIN" || val !== "")) {
+          autoSaveDashboardSettings("تم حفظ " + item.label + " تلقائياً! 🟢", item.label + " Updated");
+        }
+      }
+      
+      inputEl.addEventListener("blur", handleSave);
+      inputEl.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          inputEl.blur();
+        }
+      });
     });
   }
 </script>

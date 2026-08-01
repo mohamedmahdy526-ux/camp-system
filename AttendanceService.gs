@@ -514,6 +514,28 @@ var AttendanceService = {
     }
   },
 
+  getSessionsGuide: function() {
+    var ss = getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Sessions Guide");
+    if (!sheet) return [];
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return [];
+    
+    var headers = DB.getHeaders(sheet);
+    var data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+    
+    var sessions = [];
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      var sessionObj = {};
+      for (var j = 0; j < headers.length; j++) {
+        sessionObj[headers[j]] = row[j];
+      }
+      sessions.push(sessionObj);
+    }
+    return sessions;
+  },
+
   /**
    * Fetches statistics and active configuration settings for the Admin Dashboard.
    */
@@ -624,6 +646,8 @@ var AttendanceService = {
       }
     }
     
+    var serverTime = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss");
+
     return {
       authorized: true,
       settings: {
@@ -645,7 +669,9 @@ var AttendanceService = {
         averageQuizScore: averageQuizScore,
         currentSessionFeedbackTakers: currentSessionFeedbackTakers,
         certificateEligibleCount: certificateEligibleCount
-      }
+      },
+      sessions: this.getSessionsGuide(),
+      serverTime: serverTime
     };
   },
 

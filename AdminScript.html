@@ -66,7 +66,13 @@
           averageQuizScore: 8.5,
           currentSessionFeedbackTakers: 35,
           certificateEligibleCount: 97
-        }
+        },
+        sessions: [
+          { "Index": "0", "Session Topic": "التمهيد والترحيب (Opening & Orientation)", "Instructor": "Dr. Mohamed Mansour", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "1", "Session Topic": "Interview Skills & CV Writing", "Instructor": "Dr. Ali Abdelfatah", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "2", "Session Topic": "Professional Autonomy", "Instructor": "Dr. Mohamed Elbehairy", "Date & Day": "السبت", "Time": "6:00 PM" }
+        ],
+        serverTime: "2026-08-01T14:40:00"
       };
     }
     if (action === "updateAdminSettings") {
@@ -90,7 +96,13 @@
           averageQuizScore: 8.5,
           currentSessionFeedbackTakers: 35,
           certificateEligibleCount: 97
-        }
+        },
+        sessions: [
+          { "Index": "0", "Session Topic": "التمهيد والترحيب (Opening & Orientation)", "Instructor": "Dr. Mohamed Mansour", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "1", "Session Topic": "Interview Skills & CV Writing", "Instructor": "Dr. Ali Abdelfatah", "Date & Day": "الجمعة", "Time": "6:00 PM" },
+          { "Index": "2", "Session Topic": "Professional Autonomy", "Instructor": "Dr. Mohamed Elbehairy", "Date & Day": "السبت", "Time": "6:00 PM" }
+        ],
+        serverTime: "2026-08-01T14:40:00"
       };
     }
     return { error: "Unknown mock action" };
@@ -142,6 +154,7 @@
     clearAlerts();
     populateSessionDropdown();
     setupAutoSaveListeners();
+    setupTextAutoSaveListeners();
 
     // Load public settings first to show logo and name on login screen
     showLoading("جاري تحميل إعدادات النظام...");
@@ -270,6 +283,7 @@
 
     state.config = res.settings;
     state.stats = res.stats;
+    state.sessions = res.sessions || [];
     state.logoUrl = normalizeLogoUrl(res.settings.LogoURL);
 
     isDataLoading = true;
@@ -285,8 +299,24 @@
     document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
     document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
 
-    // Update System Status Banner
+    // Update System Status Banner & Quick Actions Toggles
     updateStatusBadges();
+    updateQuickActionButtonsStyle();
+    renderActiveSessionInfo();
+
+    // Set Last Sync time
+    var syncTimeStr = "";
+    if (res.serverTime) {
+      var tParts = res.serverTime.split("T");
+      if (tParts.length > 1) {
+        syncTimeStr = tParts[1];
+      } else {
+        syncTimeStr = formatTimestamp(new Date());
+      }
+    } else {
+      syncTimeStr = formatTimestamp(new Date());
+    }
+    document.getElementById("health-last-sync").textContent = syncTimeStr;
 
     // Update UI Form fields
     document.getElementById("admin-camp-title").textContent = res.settings.CampName;
@@ -591,30 +621,36 @@
   function setupAutoSaveListeners() {
     document.getElementById("toggle-attendance-status").addEventListener("change", function() {
       var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Attendance Opened" : "Attendance Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("toggle-quiz-status").addEventListener("change", function() {
       var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Quiz Opened" : "Quiz Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("toggle-feedback-status").addEventListener("change", function() {
       var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
-      autoSaveDashboardSettings(msg);
+      var op = this.checked ? "Feedback Opened" : "Feedback Closed";
+      autoSaveDashboardSettings(msg, op);
     });
     
     document.getElementById("select-admin-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚");
+      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚", "Session Changed");
     });
     
     document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝");
+      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝", "Feedback Session Changed");
     });
   }
 
-  function autoSaveDashboardSettings(toastMessage) {
+  function autoSaveDashboardSettings(toastMessage, opName) {
     if (isDataLoading) return;
+    
+    var saveStatus = document.getElementById("health-save-status");
+    if (saveStatus) saveStatus.textContent = "Saving...";
     
     var sessionVal = document.getElementById("select-admin-session").value;
     var feedbackSessionVal = document.getElementById("select-admin-feedback-session").value;
@@ -625,6 +661,7 @@
     var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
     var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
     var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
+    var newPinVal = document.getElementById("input-admin-new-pin").value.trim();
     
     var updates = {
       CurrentSession: sessionVal,
@@ -638,12 +675,28 @@
       FacebookURL: facebookUrlVal
     };
     
+    if (newPinVal) {
+      updates.AdminPIN = newPinVal;
+    }
+    
     callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
       isDataLoading = true;
       state.config = res.settings;
       state.stats = res.stats;
+      if (res.sessions) {
+        state.sessions = res.sessions;
+      }
+      
+      // Update stored PIN if it was successfully changed
+      if (newPinVal) {
+        state.pin = newPinVal;
+        sessionStorage.setItem("admin_pin", newPinVal);
+        document.getElementById("input-admin-new-pin").value = "";
+      }
       
       updateStatusBadges();
+      updateQuickActionButtonsStyle();
+      renderActiveSessionInfo();
       
       document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
       document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
@@ -657,10 +710,240 @@
       
       isDataLoading = false;
       
+      if (saveStatus) saveStatus.textContent = "✓ كل التغييرات محفوظة";
+      
+      updateHealthStatus(true);
+      
+      var syncTimeStr = "";
+      if (res.serverTime) {
+        var tParts = res.serverTime.split("T");
+        if (tParts.length > 1) {
+          syncTimeStr = tParts[1];
+        } else {
+          syncTimeStr = formatTimestamp(new Date());
+        }
+      } else {
+        syncTimeStr = formatTimestamp(new Date());
+      }
+      document.getElementById("health-last-sync").textContent = syncTimeStr;
+      
+      var finalOp = opName || "Settings Saved";
+      updateLastOperation(finalOp, new Date());
+      
       showToast(toastMessage || "تم حفظ التغييرات تلقائياً! 🟢", "success");
     }, function(err) {
       console.error("Auto-save failed:", err);
+      if (saveStatus) saveStatus.textContent = "فشل الحفظ ❌";
+      updateHealthStatus(false);
       showToast("فشل الحفظ التلقائي: " + err.message, "danger");
+    });
+  }
+
+  /* ================= PHASE 2 NEW HELPER FUNCTIONS ================= */
+  function switchTab(tabId) {
+    var buttons = document.querySelectorAll(".tab-btn");
+    buttons.forEach(function(btn) {
+      btn.classList.remove("active");
+    });
+    document.getElementById("tab-btn-" + tabId).classList.add("active");
+    
+    var contents = document.querySelectorAll(".tab-content");
+    contents.forEach(function(content) {
+      content.classList.remove("active");
+    });
+    document.getElementById("tab-content-" + tabId).classList.add("active");
+  }
+
+  function getSessionName(sessionVal) {
+    var idx = parseInt(sessionVal.toString().trim(), 10);
+    if (state.sessions && state.sessions.length > 0) {
+      var sess = state.sessions.find(function(s) {
+        return parseInt(s["Index"], 10) === idx;
+      });
+      if (sess) {
+        return "S" + idx + ": " + (sess["Session Topic"] || sess["Module"] || "");
+      }
+    }
+    
+    if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
+      return "S" + idx + ": " + sessionsGuideList[idx];
+    }
+    return "المحاضرة " + sessionVal;
+  }
+
+  function renderActiveSessionInfo() {
+    var selectSess = document.getElementById("select-admin-session");
+    if (!selectSess) return;
+    var activeVal = selectSess.value.toString().trim();
+    var activeIdx = parseInt(activeVal, 10);
+    
+    var sessTopic = document.getElementById("sess-info-topic");
+    var sessInstructor = document.getElementById("sess-info-instructor");
+    var sessDay = document.getElementById("sess-info-day");
+    var sessTime = document.getElementById("sess-info-time");
+    
+    if (!sessTopic) return;
+    
+    if (state.sessions && state.sessions.length > 0) {
+      var sess = state.sessions.find(function(s) {
+        return parseInt(s["Index"], 10) === activeIdx;
+      });
+      if (sess) {
+        sessTopic.textContent = sess["Session Topic"] || sess["Module"] || "-";
+        sessInstructor.textContent = sess["Instructor"] || "-";
+        sessDay.textContent = sess["Date & Day"] || "-";
+        sessTime.textContent = sess["Time"] || "-";
+        return;
+      }
+    }
+    
+    sessTopic.textContent = "المحاضرة " + activeVal;
+    sessInstructor.textContent = "-";
+    sessDay.textContent = "-";
+    sessTime.textContent = "-";
+  }
+
+  function updateQuickActionButtonsStyle() {
+    var qaAttendance = document.getElementById("qa-btn-attendance");
+    var qaQuiz = document.getElementById("qa-btn-quiz");
+    var qaFeedback = document.getElementById("qa-btn-feedback");
+    
+    if (!qaAttendance) return;
+    
+    if (state.config.Attendance === "OPEN") {
+      qaAttendance.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-attendance").textContent = "OPEN 🟢";
+    } else {
+      qaAttendance.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-attendance").textContent = "CLOSED 🔴";
+    }
+    
+    if (state.config.Quiz === "OPEN") {
+      qaQuiz.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-quiz").textContent = "OPEN 🟢";
+    } else {
+      qaQuiz.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-quiz").textContent = "CLOSED 🔴";
+    }
+    
+    if (state.config.Feedback === "OPEN") {
+      qaFeedback.className = "quick-action-btn qa-open";
+      document.getElementById("qa-status-feedback").textContent = "OPEN 🟢";
+    } else {
+      qaFeedback.className = "quick-action-btn qa-closed";
+      document.getElementById("qa-status-feedback").textContent = "CLOSED 🔴";
+    }
+  }
+
+  function toggleQuickAction(type) {
+    var chk = document.getElementById("toggle-" + type + "-status");
+    if (chk) {
+      chk.checked = !chk.checked;
+      chk.dispatchEvent(new Event("change"));
+    }
+  }
+
+  function copyQuickAttendanceLink() {
+    copyToClipboard('link-attendance-url');
+  }
+
+  function openLink(elementId) {
+    var urlInput = document.getElementById(elementId);
+    if (urlInput && urlInput.value) {
+      window.open(urlInput.value, "_blank");
+    }
+  }
+
+  function silentRefresh() {
+    var refreshBtn = document.getElementById("health-refresh-btn");
+    if (refreshBtn) refreshBtn.classList.add("spinning");
+    
+    updateLastOperation("Refreshing Data", new Date());
+    
+    callServerOption("getAdminDashboardData", [state.pin], function(res) {
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      
+      if (res.error) {
+        updateHealthStatus(false);
+        showToast("فشل تحديث البيانات: " + res.error, "danger");
+        return;
+      }
+      
+      onDashboardDataLoaded(res);
+      updateHealthStatus(true);
+      updateLastOperation("Refresh Completed", new Date());
+      showToast("تم تحديث البيانات بنجاح ↻", "success");
+    }, function(err) {
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      updateHealthStatus(false);
+      showToast("فشل تحديث البيانات: " + err.message, "danger");
+    });
+  }
+
+  function formatTimestamp(dateObj) {
+    var hours = dateObj.getHours();
+    var minutes = dateObj.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return (hours < 10 ? '0' + hours : hours) + ':' + minutes + ' ' + ampm;
+  }
+
+  function updateHealthStatus(isHealthy) {
+    var healthRow = document.getElementById("health-title-row");
+    if (!healthRow) return;
+    if (isHealthy) {
+      healthRow.className = "health-title-row";
+      healthRow.innerHTML = "<span>System Healthy</span><span>🟢</span>";
+    } else {
+      healthRow.className = "health-title-row failed";
+      healthRow.innerHTML = "<span>Sync Failed</span><span>🔴</span>";
+    }
+  }
+
+  function updateLastOperation(opName, dateObj) {
+    var lastOp = document.getElementById("health-last-op");
+    if (lastOp) {
+      lastOp.textContent = opName + " (" + formatTimestamp(dateObj) + ")";
+    }
+  }
+
+  function setupTextAutoSaveListeners() {
+    var textInputs = [
+      { id: "input-admin-camp-name", key: "CampName", label: "اسم الكامب" },
+      { id: "input-admin-min-attendance", key: "MinAttendance", label: "الحد الأدنى للحضور" },
+      { id: "input-admin-logo-url", key: "LogoURL", label: "لوجو الكامب" },
+      { id: "input-admin-facebook-url", key: "FacebookURL", label: "رابط الفيسبوك" },
+      { id: "input-admin-new-pin", key: "AdminPIN", label: "رمز التحقق" }
+    ];
+    
+    textInputs.forEach(function(item) {
+      var inputEl = document.getElementById(item.id);
+      if (!inputEl) return;
+      
+      function handleSave() {
+        if (isDataLoading) return;
+        var val = inputEl.value.trim();
+        var oldVal = (state.config[item.key] !== undefined ? state.config[item.key].toString().trim() : "");
+        
+        if (item.key === "MinAttendance") {
+          val = Number(val);
+          oldVal = Number(oldVal);
+        }
+        
+        if (val !== oldVal && (item.key !== "AdminPIN" || val !== "")) {
+          autoSaveDashboardSettings("تم حفظ " + item.label + " تلقائياً! 🟢", item.label + " Updated");
+        }
+      }
+      
+      inputEl.addEventListener("blur", handleSave);
+      inputEl.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          inputEl.blur();
+        }
+      });
     });
   }
 </script>
