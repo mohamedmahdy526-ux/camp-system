@@ -61,47 +61,33 @@
   /* ================= APP CONTAINER ================= */
   .app-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 520px;
+    margin: auto;
     background: var(--card-bg);
     border: 1px solid var(--border);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 24px;
-    padding: 25px 20px;
+    padding: 20px 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     z-index: 1;
     position: relative;
-    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .app-container.dashboard-mode {
-    max-width: 960px;
-  }
-
-  /* Two column grid container on desktop */
+  /* Single column container */
   .dashboard-grid-container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin-top: 20px;
-  }
-
-  @media (min-width: 768px) {
-    .dashboard-grid-container {
-      grid-template-columns: 1.15fr 0.85fr;
-    }
-    
-    .stats-grid {
-      grid-template-columns: repeat(4, 1fr) !important;
-    }
+    gap: 14px;
+    margin-top: 14px;
   }
 
   /* ================= SCREENS & TRANSITIONS ================= */
   .screen {
     display: none;
     opacity: 0;
-    transform: translateY(15px);
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateY(10px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .screen.active {
     display: block;
@@ -112,26 +98,26 @@
   /* ================= BRANDING HEADER ================= */
   .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
   .brand-logo-container {
-    width: 100px;
-    height: 100px;
+    width: 72px;
+    height: 72px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: 20px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 12px;
-    font-size: 26px;
+    margin-bottom: 8px;
+    font-size: 22px;
     position: relative;
     overflow: hidden;
   }
   .brand-logo-img {
     width: 100%;
     height: 100%;
-    border-radius: 24px;
+    border-radius: 20px;
     object-fit: cover;
     position: absolute;
     top: 0;
@@ -142,12 +128,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 800;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
-    direction: ltr;
+    margin-bottom: 4px;
+    direction: rtl;
   }
   .title-internship {
     color: var(--text-primary);
@@ -156,19 +142,19 @@
     color: var(--primary);
   }
   .camp-subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
   }
   .session-badge {
     display: inline-block;
     background: rgba(197, 160, 89, 0.15);
     border: 1px solid rgba(197, 160, 89, 0.3);
     color: #f59e0b;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 20px;
   }
 
@@ -176,8 +162,8 @@
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
   @media (min-width: 576px) {
     .stats-grid {
@@ -192,8 +178,8 @@
   .stat-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px 12px;
+    border-radius: 14px;
+    padding: 14px 10px;
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
@@ -202,7 +188,7 @@
     box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
   }
   .stat-num {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--text-primary);
   }
@@ -210,20 +196,24 @@
     font-size: 11px;
     color: var(--text-secondary);
     margin-top: 4px;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   /* ================= ADMIN CARD ================= */
   .admin-card {
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 20px 16px;
+    border-radius: 18px;
+    padding: 16px 12px;
+    margin-bottom: 14px;
+  }
+  .admin-card:last-child {
+    margin-bottom: 0;
   }
   .card-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border-right: 3px solid var(--primary);
     padding-right: 8px;
     text-align: right;
@@ -231,15 +221,15 @@
 
   /* ================= FORM ELEMENTS ================= */
   .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-align: right;
   }
   .form-label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 6px;
-    font-weight: 600;
+    margin-bottom: 4px;
+    font-weight: 500;
   }
   .form-input, .form-select {
     width: 100%;
@@ -247,11 +237,13 @@
     border: 1px solid var(--border);
     color: var(--text-primary);
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 13px;
     outline: none;
     transition: 0.2s ease;
     text-align: right;
+    font-family: inherit;
+    font-weight: 500;
   }
   .form-select option {
     background: #04221f;
@@ -267,9 +259,10 @@
     border: none;
     outline: none;
     font-family: inherit;
-    font-weight: bold;
-    font-size: 13px;
-    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 13.5px;
+    height: 48px;
+    padding: 0 20px;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -632,99 +625,15 @@
   }
 
   /* ================= STAT CARD SPECIFICS ================= */
-  .stat-card.stat-card-wide {
-    grid-column: span 2;
-    background: rgba(197, 160, 89, 0.05);
-    border-color: rgba(197, 160, 89, 0.4);
-  }
-  @media (min-width: 576px) {
-    .stat-card.stat-card-wide {
-      grid-column: span 3;
-    }
-  }
-  @media (min-width: 992px) {
-    .stat-card.stat-card-wide {
-      grid-column: span 2;
-    }
-  }
-  
   .stat-num {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   
   .stat-subtext {
     font-size: 9px;
     color: var(--text-muted);
     margin-top: 4px;
-    font-weight: normal;
-  }
-
-  /* ================= QUICK ACTIONS GRID ================= */
-  .quick-actions-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    text-align: right;
-    color: var(--text-secondary);
-  }
-  
-  .quick-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
-  }
-  @media (min-width: 768px) {
-    .quick-actions-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-  
-  .quick-action-btn {
-    padding: 14px 10px;
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    border: 1px solid var(--border);
-    text-align: center;
-    background: rgba(255, 255, 255, 0.02);
-    color: var(--text-primary);
-  }
-  
-  .quick-action-btn.qa-open {
-    background: rgba(16, 185, 129, 0.08);
-    color: #34d399;
-    border-color: rgba(16, 185, 129, 0.3);
-  }
-  
-  .quick-action-btn.qa-closed {
-    background: rgba(239, 68, 68, 0.08);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-  
-  .quick-action-btn.qa-link {
-    background: rgba(197, 160, 89, 0.08);
-    color: var(--primary-hover);
-    border-color: rgba(197, 160, 89, 0.3);
-  }
-  
-  .quick-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .quick-action-btn .qa-status {
-    font-size: 10px;
-    opacity: 0.8;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   /* ================= SESSION INFO CARD ================= */
@@ -901,5 +810,18 @@
   
   .btn-link-open:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  .settings-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 18px 0 10px 0;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+    padding-bottom: 4px;
+    text-align: right;
+  }
+  .settings-section-title:first-of-type {
+    margin-top: 5px;
   }
 </style>

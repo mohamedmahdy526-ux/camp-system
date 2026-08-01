@@ -72,47 +72,33 @@
   /* ================= APP CONTAINER ================= */
   .app-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 520px;
+    margin: auto;
     background: var(--card-bg);
     border: 1px solid var(--border);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 24px;
-    padding: 25px 20px;
+    padding: 20px 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     z-index: 1;
     position: relative;
-    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .app-container.dashboard-mode {
-    max-width: 960px;
-  }
-
-  /* Two column grid container on desktop */
+  /* Single column container */
   .dashboard-grid-container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin-top: 20px;
-  }
-
-  @media (min-width: 768px) {
-    .dashboard-grid-container {
-      grid-template-columns: 1.15fr 0.85fr;
-    }
-    
-    .stats-grid {
-      grid-template-columns: repeat(4, 1fr) !important;
-    }
+    gap: 14px;
+    margin-top: 14px;
   }
 
   /* ================= SCREENS & TRANSITIONS ================= */
   .screen {
     display: none;
     opacity: 0;
-    transform: translateY(15px);
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateY(10px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .screen.active {
     display: block;
@@ -123,26 +109,26 @@
   /* ================= BRANDING HEADER ================= */
   .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
   .brand-logo-container {
-    width: 100px;
-    height: 100px;
+    width: 72px;
+    height: 72px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: 20px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 12px;
-    font-size: 26px;
+    margin-bottom: 8px;
+    font-size: 22px;
     position: relative;
     overflow: hidden;
   }
   .brand-logo-img {
     width: 100%;
     height: 100%;
-    border-radius: 24px;
+    border-radius: 20px;
     object-fit: cover;
     position: absolute;
     top: 0;
@@ -153,12 +139,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 800;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
-    direction: ltr;
+    margin-bottom: 4px;
+    direction: rtl;
   }
   .title-internship {
     color: var(--text-primary);
@@ -167,19 +153,19 @@
     color: var(--primary);
   }
   .camp-subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
   }
   .session-badge {
     display: inline-block;
     background: rgba(197, 160, 89, 0.15);
     border: 1px solid rgba(197, 160, 89, 0.3);
     color: #f59e0b;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 20px;
   }
 
@@ -187,8 +173,8 @@
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
   @media (min-width: 576px) {
     .stats-grid {
@@ -203,8 +189,8 @@
   .stat-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px 12px;
+    border-radius: 14px;
+    padding: 14px 10px;
     text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
@@ -213,7 +199,7 @@
     box-shadow: 0 4px 15px rgba(197, 160, 89, 0.1);
   }
   .stat-num {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--text-primary);
   }
@@ -221,20 +207,24 @@
     font-size: 11px;
     color: var(--text-secondary);
     margin-top: 4px;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   /* ================= ADMIN CARD ================= */
   .admin-card {
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 20px 16px;
+    border-radius: 18px;
+    padding: 16px 12px;
+    margin-bottom: 14px;
+  }
+  .admin-card:last-child {
+    margin-bottom: 0;
   }
   .card-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border-right: 3px solid var(--primary);
     padding-right: 8px;
     text-align: right;
@@ -242,15 +232,15 @@
 
   /* ================= FORM ELEMENTS ================= */
   .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-align: right;
   }
   .form-label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 6px;
-    font-weight: 600;
+    margin-bottom: 4px;
+    font-weight: 500;
   }
   .form-input, .form-select {
     width: 100%;
@@ -258,11 +248,13 @@
     border: 1px solid var(--border);
     color: var(--text-primary);
     padding: 12px 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 13px;
     outline: none;
     transition: 0.2s ease;
     text-align: right;
+    font-family: inherit;
+    font-weight: 500;
   }
   .form-select option {
     background: #04221f;
@@ -278,9 +270,10 @@
     border: none;
     outline: none;
     font-family: inherit;
-    font-weight: bold;
-    font-size: 13px;
-    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 13.5px;
+    height: 48px;
+    padding: 0 20px;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -643,99 +636,15 @@
   }
 
   /* ================= STAT CARD SPECIFICS ================= */
-  .stat-card.stat-card-wide {
-    grid-column: span 2;
-    background: rgba(197, 160, 89, 0.05);
-    border-color: rgba(197, 160, 89, 0.4);
-  }
-  @media (min-width: 576px) {
-    .stat-card.stat-card-wide {
-      grid-column: span 3;
-    }
-  }
-  @media (min-width: 992px) {
-    .stat-card.stat-card-wide {
-      grid-column: span 2;
-    }
-  }
-  
   .stat-num {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   
   .stat-subtext {
     font-size: 9px;
     color: var(--text-muted);
     margin-top: 4px;
-    font-weight: normal;
-  }
-
-  /* ================= QUICK ACTIONS GRID ================= */
-  .quick-actions-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    text-align: right;
-    color: var(--text-secondary);
-  }
-  
-  .quick-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
-  }
-  @media (min-width: 768px) {
-    .quick-actions-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-  
-  .quick-action-btn {
-    padding: 14px 10px;
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    border: 1px solid var(--border);
-    text-align: center;
-    background: rgba(255, 255, 255, 0.02);
-    color: var(--text-primary);
-  }
-  
-  .quick-action-btn.qa-open {
-    background: rgba(16, 185, 129, 0.08);
-    color: #34d399;
-    border-color: rgba(16, 185, 129, 0.3);
-  }
-  
-  .quick-action-btn.qa-closed {
-    background: rgba(239, 68, 68, 0.08);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-  
-  .quick-action-btn.qa-link {
-    background: rgba(197, 160, 89, 0.08);
-    color: var(--primary-hover);
-    border-color: rgba(197, 160, 89, 0.3);
-  }
-  
-  .quick-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .quick-action-btn .qa-status {
-    font-size: 10px;
-    opacity: 0.8;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   /* ================= SESSION INFO CARD ================= */
@@ -913,6 +822,19 @@
   .btn-link-open:hover {
     background: rgba(255, 255, 255, 0.1);
   }
+
+  .settings-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 18px 0 10px 0;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+    padding-bottom: 4px;
+    text-align: right;
+  }
+  .settings-section-title:first-of-type {
+    margin-top: 5px;
+  }
 </style>
 
   </head>
@@ -957,23 +879,24 @@
 
       <!-- ================= SCREEN: DASHBOARD ================= -->
       <div id="screen-admin-dashboard" class="screen">
-        <div class="header" style="margin-bottom: 20px;">
+        <div class="header" style="margin-bottom: 14px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="padding: 6px 12px; font-size: 11px;">خروج 🚪</button>
+            <button class="btn btn-secondary btn-sm" onclick="handleLogout()" style="padding: 6px 12px; font-size: 11px; height: 32px;">خروج 🚪</button>
             <span class="session-badge dynamic-session-badge">لوحة الإدارة والتحكم</span>
           </div>
-          <div class="brand-logo-container" style="width: 50px; height: 50px; margin: 10px auto;">
+          <div class="brand-logo-container" style="width: 50px; height: 50px; margin: 6px auto;">
             <span class="brand-logo-text-fallback">🎛️</span>
             <img class="brand-logo-img dynamic-logo-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if (fb && this.src.indexOf('base64') === -1) { fb.style.display='none'; this.style.display='block'; }" onerror="this.style.display='none'; var fb = this.parentElement.querySelector('.brand-logo-text-fallback'); if(fb) fb.style.display='block';" alt="Logo">
           </div>
-          <h2 class="dashboard-title" id="admin-camp-title">كامب الامتياز</h2>
+          <h2 class="dashboard-title" id="admin-camp-title" style="font-size: 18px; font-weight: 700; margin-bottom: 2px;">كامب الامتياز</h2>
+          <div class="camp-subtitle" style="font-size: 12px; color: var(--text-secondary); font-weight: 500;">مبادرة ما ينفع الناس</div>
         </div>
 
         <div id="dashboard-alert"></div>
 
         <!-- Tabs Navigation -->
         <div class="tab-nav">
-          <button id="tab-btn-dashboard" class="tab-btn active" onclick="switchTab('dashboard')">📊 الرئيسية</button>
+          <button id="tab-btn-dashboard" class="tab-btn active" onclick="switchTab('dashboard')">🏠 الرئيسية</button>
           <button id="tab-btn-settings" class="tab-btn" onclick="switchTab('settings')">⚙️ الإعدادات</button>
           <button id="tab-btn-links" class="tab-btn" onclick="switchTab('links')">🔗 الروابط</button>
         </div>
@@ -995,63 +918,42 @@
 
           <!-- Section: Statistics -->
           <div class="stats-grid">
-            <div class="stat-card stat-card-wide">
+            <div class="stat-card">
               <div class="stat-num" id="stat-registered">-</div>
-              <div class="stat-label">👥 الطلاب المسجلين بالكامب</div>
+              <div class="stat-label">المسجلين بالكامب</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
             <div class="stat-card">
               <div class="stat-num" id="stat-attendees">-</div>
-              <div class="stat-label">✅ حضور المحاضرة</div>
+              <div class="stat-label">حضور المحاضرة</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
             <div class="stat-card">
               <div class="stat-num" id="stat-quiz-takers">-</div>
-              <div class="stat-label">📝 كويزات مقدمة</div>
+              <div class="stat-label">كويزات مقدمة</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
             <div class="stat-card">
               <div class="stat-num" id="stat-quiz-avg">-</div>
-              <div class="stat-label">⭐ متوسط الكويز</div>
+              <div class="stat-label">متوسط الدرجات</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
             <div class="stat-card">
               <div class="stat-num" id="stat-feedback-takers">-</div>
-              <div class="stat-label">💬 استمارات التقييم</div>
+              <div class="stat-label">استمارات التقييم</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
             <div class="stat-card">
               <div class="stat-num" id="stat-eligible">-</div>
-              <div class="stat-label">🎓 مستحقي الشهادة</div>
+              <div class="stat-label">مستحقي الشهادة</div>
               <div class="stat-subtext">تحديث تلقائي</div>
             </div>
           </div>
 
-          <!-- Quick Actions Grid -->
-          <div class="quick-actions-title">⚡ الإجراءات السريعة</div>
-          <div class="quick-actions-grid">
-            <button id="qa-btn-attendance" onclick="toggleQuickAction('attendance')" class="quick-action-btn qa-closed">
-              <span>Attendance</span>
-              <span class="qa-status" id="qa-status-attendance">CLOSED 🔴</span>
-            </button>
-            <button id="qa-btn-quiz" onclick="toggleQuickAction('quiz')" class="quick-action-btn qa-closed">
-              <span>Quiz</span>
-              <span class="qa-status" id="qa-status-quiz">CLOSED 🔴</span>
-            </button>
-            <button id="qa-btn-feedback" onclick="toggleQuickAction('feedback')" class="quick-action-btn qa-closed">
-              <span>Feedback</span>
-              <span class="qa-status" id="qa-status-feedback">CLOSED 🔴</span>
-            </button>
-            <button onclick="copyQuickAttendanceLink()" class="quick-action-btn qa-link">
-              <span>رابط التحضير</span>
-              <span class="qa-status">📋 نسخ الرابط</span>
-            </button>
-          </div>
-
           <!-- Main Dashboard Content Grid -->
-          <div class="dashboard-grid-container" style="margin-top: 0; display: grid; gap: 20px;">
+          <div class="dashboard-grid-container" style="margin-top: 0; display: grid; gap: 14px;">
             <!-- Session Info Card -->
-            <div class="session-info-card">
+            <div class="session-info-card" style="padding: 14px 12px;">
               <h3 class="session-info-title">تفاصيل المحاضرة النشطة 📚</h3>
               <div class="session-info-grid">
                 <div class="session-info-row">
@@ -1074,7 +976,7 @@
             </div>
 
             <!-- System Health & Sync Status Card -->
-            <div class="health-card">
+            <div class="health-card" style="padding: 14px 12px;">
               <div class="health-status-header">
                 <button onclick="silentRefresh()" class="health-refresh-btn" id="health-refresh-btn" title="تحديث البيانات">↻</button>
                 <div class="health-title-row" id="health-title-row">
@@ -1103,6 +1005,9 @@
           <div class="admin-card" style="margin-top: 0;">
             <h3 class="card-title">إعدادات المحاضرة والتحضير</h3>
             
+            <!-- إعدادات الجلسة -->
+            <div class="settings-section-title">إعدادات الجلسة</div>
+            
             <div class="form-group">
               <label for="select-admin-session" class="form-label">المحاضرة النشطة حالياً (الحضور والكويز):</label>
               <select id="select-admin-session" class="form-select">
@@ -1110,42 +1015,85 @@
               </select>
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <div class="form-group" style="margin-top: 12px;">
               <label for="select-admin-feedback-session" class="form-label">المحاضرة النشطة لاستبيان التقييم (Feedback):</label>
               <select id="select-admin-feedback-session" class="form-select">
                 <!-- Dynamically populated options S0..S15 -->
               </select>
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <!-- Toggles inside Settings -->
+            <div class="toggle-group" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 12px; border-radius: 12px; margin-top: 12px;">
+              <div>
+                <div class="toggle-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">تسجيل الحضور والتحضير</div>
+                <div class="toggle-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">فتح أو إغلاق إمكانية التحضير للطلاب</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-attendance-status">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="toggle-group" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 12px; border-radius: 12px; margin-top: 12px;">
+              <div>
+                <div class="toggle-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">تفعيل الكويز التفاعلي</div>
+                <div class="toggle-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">فتح أو إغلاق إمكانية حل الكويز للطلاب</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-quiz-status">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="toggle-group" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 12px; border-radius: 12px; margin-top: 12px;">
+              <div>
+                <div class="toggle-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary);">تفعيل استطلاع الرأي والتقييم</div>
+                <div class="toggle-desc" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">فتح أو إغلاق إمكانية إدخال استمارات التقييم</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-feedback-status">
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <!-- إعدادات النظام -->
+            <div class="settings-section-title">إعدادات النظام</div>
+
+            <div class="form-group">
               <label for="input-admin-camp-name" class="form-label">اسم الكامب التدريبي:</label>
               <input type="text" id="input-admin-camp-name" class="form-input" required>
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <div class="form-group" style="margin-top: 12px;">
               <label for="input-admin-min-attendance" class="form-label">الحد الأدنى للمحاضرات للشهادة:</label>
               <input type="number" id="input-admin-min-attendance" class="form-input" min="1" max="16" required>
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <!-- الهوية البصرية -->
+            <div class="settings-section-title">الهوية البصرية</div>
+
+            <div class="form-group">
               <label for="input-admin-logo-url" class="form-label">رابط لوجو الكامب (جوجل درايف أو رابط مباشر):</label>
               <input type="text" id="input-admin-logo-url" class="form-input" placeholder="مثال: https://drive.google.com/file/d/...">
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <div class="form-group" style="margin-top: 12px;">
               <label for="input-admin-facebook-url" class="form-label">رابط صفحة فيسبوك الرسمية للمبادرة:</label>
               <input type="text" id="input-admin-facebook-url" class="form-input" placeholder="https://www.facebook.com/yourpage">
             </div>
 
-            <div class="form-group" style="margin-top: 15px;">
+            <!-- الأمان -->
+            <div class="settings-section-title">الأمان والخصوصية</div>
+
+            <div class="form-group">
               <label for="input-admin-new-pin" class="form-label">رمز التحقق الإداري الجديد (PIN):</label>
               <input type="text" id="input-admin-new-pin" class="form-input" placeholder="اتركه فارغاً للإبقاء على الرمز الحالي">
             </div>
-            
-            <!-- Hidden inputs to keep bindings intact -->
-            <input type="checkbox" id="toggle-attendance-status" style="display:none;">
-            <input type="checkbox" id="toggle-quiz-status" style="display:none;">
-            <input type="checkbox" id="toggle-feedback-status" style="display:none;">
+
+            <!-- Save Settings Button -->
+            <button onclick="saveDashboardSettings()" class="btn btn-primary" style="width: 100%; margin-top: 18px; height: 48px;">
+              💾 حفظ الإعدادات
+            </button>
           </div>
         </div>
 
@@ -1508,9 +1456,8 @@
     document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
     document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
 
-    // Update System Status Banner & Quick Actions Toggles
+    // Update System Status Banner
     updateStatusBadges();
-    updateQuickActionButtonsStyle();
     renderActiveSessionInfo();
 
     // Set Last Sync time
@@ -1802,56 +1749,35 @@
     var attendanceBadge = document.getElementById("status-badge-attendance");
     if (state.config.Attendance === "OPEN") {
       attendanceBadge.className = "status-indicator open";
-      attendanceBadge.textContent = "Attendance: OPEN";
+      attendanceBadge.textContent = "Attendance";
     } else {
       attendanceBadge.className = "status-indicator closed";
-      attendanceBadge.textContent = "Attendance: CLOSED";
+      attendanceBadge.textContent = "Attendance";
     }
     
     var quizBadge = document.getElementById("status-badge-quiz");
     if (state.config.Quiz === "OPEN") {
       quizBadge.className = "status-indicator open";
-      quizBadge.textContent = "Quiz: OPEN";
+      quizBadge.textContent = "Quiz";
     } else {
       quizBadge.className = "status-indicator closed";
-      quizBadge.textContent = "Quiz: CLOSED";
+      quizBadge.textContent = "Quiz";
     }
     
     var feedbackBadge = document.getElementById("status-badge-feedback");
     if (state.config.Feedback === "OPEN") {
       feedbackBadge.className = "status-indicator open";
-      feedbackBadge.textContent = "Feedback: OPEN";
+      feedbackBadge.textContent = "Feedback";
     } else {
       feedbackBadge.className = "status-indicator closed";
-      feedbackBadge.textContent = "Feedback: CLOSED";
+      feedbackBadge.textContent = "Feedback";
     }
   }
 
   function setupAutoSaveListeners() {
-    document.getElementById("toggle-attendance-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
-      var op = this.checked ? "Attendance Opened" : "Attendance Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
-    document.getElementById("toggle-quiz-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
-      var op = this.checked ? "Quiz Opened" : "Quiz Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
-    document.getElementById("toggle-feedback-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
-      var op = this.checked ? "Feedback Opened" : "Feedback Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
+    // Only listen to select-admin-session change to dynamically update active session info on settings change
     document.getElementById("select-admin-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚", "Session Changed");
-    });
-    
-    document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝", "Feedback Session Changed");
+      renderActiveSessionInfo();
     });
   }
 
@@ -1870,7 +1796,6 @@
     var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
     var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
     var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
-    var newPinVal = document.getElementById("input-admin-new-pin").value.trim();
     
     var updates = {
       CurrentSession: sessionVal,
@@ -1884,10 +1809,6 @@
       FacebookURL: facebookUrlVal
     };
     
-    if (newPinVal) {
-      updates.AdminPIN = newPinVal;
-    }
-    
     callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
       isDataLoading = true;
       state.config = res.settings;
@@ -1896,15 +1817,7 @@
         state.sessions = res.sessions;
       }
       
-      // Update stored PIN if it was successfully changed
-      if (newPinVal) {
-        state.pin = newPinVal;
-        sessionStorage.setItem("admin_pin", newPinVal);
-        document.getElementById("input-admin-new-pin").value = "";
-      }
-      
       updateStatusBadges();
-      updateQuickActionButtonsStyle();
       renderActiveSessionInfo();
       
       document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
@@ -2012,49 +1925,7 @@
     sessTime.textContent = "-";
   }
 
-  function updateQuickActionButtonsStyle() {
-    var qaAttendance = document.getElementById("qa-btn-attendance");
-    var qaQuiz = document.getElementById("qa-btn-quiz");
-    var qaFeedback = document.getElementById("qa-btn-feedback");
-    
-    if (!qaAttendance) return;
-    
-    if (state.config.Attendance === "OPEN") {
-      qaAttendance.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-attendance").textContent = "OPEN 🟢";
-    } else {
-      qaAttendance.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-attendance").textContent = "CLOSED 🔴";
-    }
-    
-    if (state.config.Quiz === "OPEN") {
-      qaQuiz.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-quiz").textContent = "OPEN 🟢";
-    } else {
-      qaQuiz.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-quiz").textContent = "CLOSED 🔴";
-    }
-    
-    if (state.config.Feedback === "OPEN") {
-      qaFeedback.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-feedback").textContent = "OPEN 🟢";
-    } else {
-      qaFeedback.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-feedback").textContent = "CLOSED 🔴";
-    }
-  }
 
-  function toggleQuickAction(type) {
-    var chk = document.getElementById("toggle-" + type + "-status");
-    if (chk) {
-      chk.checked = !chk.checked;
-      chk.dispatchEvent(new Event("change"));
-    }
-  }
-
-  function copyQuickAttendanceLink() {
-    copyToClipboard('link-attendance-url');
-  }
 
   function openLink(elementId) {
     var urlInput = document.getElementById(elementId);

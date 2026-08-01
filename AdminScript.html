@@ -299,9 +299,8 @@
     document.getElementById("stat-feedback-takers").textContent = res.stats.currentSessionFeedbackTakers || 0;
     document.getElementById("stat-eligible").textContent = res.stats.certificateEligibleCount || 0;
 
-    // Update System Status Banner & Quick Actions Toggles
+    // Update System Status Banner
     updateStatusBadges();
-    updateQuickActionButtonsStyle();
     renderActiveSessionInfo();
 
     // Set Last Sync time
@@ -593,56 +592,35 @@
     var attendanceBadge = document.getElementById("status-badge-attendance");
     if (state.config.Attendance === "OPEN") {
       attendanceBadge.className = "status-indicator open";
-      attendanceBadge.textContent = "Attendance: OPEN";
+      attendanceBadge.textContent = "Attendance";
     } else {
       attendanceBadge.className = "status-indicator closed";
-      attendanceBadge.textContent = "Attendance: CLOSED";
+      attendanceBadge.textContent = "Attendance";
     }
     
     var quizBadge = document.getElementById("status-badge-quiz");
     if (state.config.Quiz === "OPEN") {
       quizBadge.className = "status-indicator open";
-      quizBadge.textContent = "Quiz: OPEN";
+      quizBadge.textContent = "Quiz";
     } else {
       quizBadge.className = "status-indicator closed";
-      quizBadge.textContent = "Quiz: CLOSED";
+      quizBadge.textContent = "Quiz";
     }
     
     var feedbackBadge = document.getElementById("status-badge-feedback");
     if (state.config.Feedback === "OPEN") {
       feedbackBadge.className = "status-indicator open";
-      feedbackBadge.textContent = "Feedback: OPEN";
+      feedbackBadge.textContent = "Feedback";
     } else {
       feedbackBadge.className = "status-indicator closed";
-      feedbackBadge.textContent = "Feedback: CLOSED";
+      feedbackBadge.textContent = "Feedback";
     }
   }
 
   function setupAutoSaveListeners() {
-    document.getElementById("toggle-attendance-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم فتح تسجيل الحضور 🟢" : "تم إغلاق تسجيل الحضور 🔴";
-      var op = this.checked ? "Attendance Opened" : "Attendance Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
-    document.getElementById("toggle-quiz-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم تفعيل الكويز التفاعلي 🟢" : "تم إغلاق الكويز التفاعلي 🔴";
-      var op = this.checked ? "Quiz Opened" : "Quiz Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
-    document.getElementById("toggle-feedback-status").addEventListener("change", function() {
-      var msg = this.checked ? "تم تفعيل استطلاع الرأي 🟢" : "تم إغلاق استطلاع الرأي 🔴";
-      var op = this.checked ? "Feedback Opened" : "Feedback Closed";
-      autoSaveDashboardSettings(msg, op);
-    });
-    
+    // Only listen to select-admin-session change to dynamically update active session info on settings change
     document.getElementById("select-admin-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير المحاضرة النشطة 📚", "Session Changed");
-    });
-    
-    document.getElementById("select-admin-feedback-session").addEventListener("change", function() {
-      autoSaveDashboardSettings("تم تغيير محاضرة التقييم النشطة 📝", "Feedback Session Changed");
+      renderActiveSessionInfo();
     });
   }
 
@@ -661,7 +639,6 @@
     var minAttendance = Number(document.getElementById("input-admin-min-attendance").value);
     var logoUrlVal = document.getElementById("input-admin-logo-url").value.trim();
     var facebookUrlVal = document.getElementById("input-admin-facebook-url").value.trim();
-    var newPinVal = document.getElementById("input-admin-new-pin").value.trim();
     
     var updates = {
       CurrentSession: sessionVal,
@@ -675,10 +652,6 @@
       FacebookURL: facebookUrlVal
     };
     
-    if (newPinVal) {
-      updates.AdminPIN = newPinVal;
-    }
-    
     callServerOption("updateAdminSettings", [state.pin, updates], function(res) {
       isDataLoading = true;
       state.config = res.settings;
@@ -687,15 +660,7 @@
         state.sessions = res.sessions;
       }
       
-      // Update stored PIN if it was successfully changed
-      if (newPinVal) {
-        state.pin = newPinVal;
-        sessionStorage.setItem("admin_pin", newPinVal);
-        document.getElementById("input-admin-new-pin").value = "";
-      }
-      
       updateStatusBadges();
-      updateQuickActionButtonsStyle();
       renderActiveSessionInfo();
       
       document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
@@ -803,49 +768,7 @@
     sessTime.textContent = "-";
   }
 
-  function updateQuickActionButtonsStyle() {
-    var qaAttendance = document.getElementById("qa-btn-attendance");
-    var qaQuiz = document.getElementById("qa-btn-quiz");
-    var qaFeedback = document.getElementById("qa-btn-feedback");
-    
-    if (!qaAttendance) return;
-    
-    if (state.config.Attendance === "OPEN") {
-      qaAttendance.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-attendance").textContent = "OPEN 🟢";
-    } else {
-      qaAttendance.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-attendance").textContent = "CLOSED 🔴";
-    }
-    
-    if (state.config.Quiz === "OPEN") {
-      qaQuiz.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-quiz").textContent = "OPEN 🟢";
-    } else {
-      qaQuiz.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-quiz").textContent = "CLOSED 🔴";
-    }
-    
-    if (state.config.Feedback === "OPEN") {
-      qaFeedback.className = "quick-action-btn qa-open";
-      document.getElementById("qa-status-feedback").textContent = "OPEN 🟢";
-    } else {
-      qaFeedback.className = "quick-action-btn qa-closed";
-      document.getElementById("qa-status-feedback").textContent = "CLOSED 🔴";
-    }
-  }
 
-  function toggleQuickAction(type) {
-    var chk = document.getElementById("toggle-" + type + "-status");
-    if (chk) {
-      chk.checked = !chk.checked;
-      chk.dispatchEvent(new Event("change"));
-    }
-  }
-
-  function copyQuickAttendanceLink() {
-    copyToClipboard('link-attendance-url');
-  }
 
   function openLink(elementId) {
     var urlInput = document.getElementById(elementId);
