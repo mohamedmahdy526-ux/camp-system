@@ -527,6 +527,22 @@
         </div>
       </div>
 
+      <!-- ================= SCREEN: FEEDBACK CLOSED ================= -->
+      <div id="screen-feedback-closed" class="screen">
+        <div class="header">
+          <div class="success-icon-container" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); width: 80px; height: 80px; border: 2px solid var(--warning); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);">
+            <div class="success-icon" style="color: var(--warning); font-size: 40px; font-weight: bold; line-height: 80px;">🔔</div>
+          </div>
+          <h2 class="result-title">استبيان التقييم مغلق</h2>
+          <div class="camp-subtitle dynamic-camp-subtitle" style="font-size: 13px; color: var(--text-muted); font-weight: 700; margin-top: 5px;">تقييم المحاضرة...</div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0; color: var(--text-secondary); line-height: 1.6; font-size: 14.5px;">
+          عذراً، استطلاع الرأي والتقييم للمحاضرة غير متاح حالياً. <br> 
+          يرجى المحاولة بعد نهاية المحاضرة النشطة أو التواصل مع إدارة الكامب.
+        </div>
+      </div>
+
       <!-- ================= SCREEN: FEEDBACK FORM ================= -->
       <div id="screen-feedback-questions" class="screen">
         <div class="header">
@@ -809,6 +825,13 @@
     // Update branding text
     updateBranding();
 
+    // Check if feedback is open
+    var isFeedbackOpen = (settings.Feedback && settings.Feedback.toString().toUpperCase() === "OPEN");
+    if (!isFeedbackOpen) {
+      showScreen("screen-feedback-closed");
+      return;
+    }
+
     // Check if phone number is passed in URL
     var urlPhone = "";
     try {
@@ -823,17 +846,20 @@
       urlPhone = urlParams.get('phone') || "";
     }
 
-    if (urlPhone) {
+    if (urlPhone && urlPhone.trim().replace(/[^\d]/g, "").length >= 8) {
       urlPhone = urlPhone.trim();
-      if (urlPhone.replace(/[^\d]/g, "").length >= 8) {
-        var phoneInput = document.getElementById('input-feedback-phone');
-        if (phoneInput) {
-          phoneInput.value = urlPhone;
-        }
-        state.phone = urlPhone;
-        showLoading("جاري التحقق من رقم الهاتف تلقائياً...");
-        callServerOption("checkFeedbackStatus", [urlPhone], onFeedbackStatusLoaded, onAuthError);
+      var phoneInput = document.getElementById('input-feedback-phone');
+      if (phoneInput) {
+        phoneInput.value = urlPhone;
       }
+      state.phone = urlPhone;
+      showLoading("جاري التحقق من رقم الهاتف تلقائياً...");
+      callServerOption("checkFeedbackStatus", [urlPhone], onFeedbackStatusLoaded, onAuthError);
+    } else {
+      state.phone = "ANONYMOUS";
+      document.getElementById("feedback-current-session-title").textContent = "تقييم: " + getSessionName(state.session);
+      showScreen("screen-feedback-questions");
+      updateFeedbackNavigation();
     }
   }
 
@@ -1064,7 +1090,7 @@
   }
 
   function showResultsScreen() {
-    document.getElementById("result-student-name").textContent = state.studentName;
+    document.getElementById("result-student-name").textContent = state.studentName || "مشاركة مجهولة (Anonymous)";
     showScreen("screen-feedback-result");
   }
 

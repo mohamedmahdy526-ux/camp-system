@@ -678,20 +678,28 @@ var AttendanceService = {
       var currentSession = (settings.FeedbackSession !== undefined && settings.FeedbackSession !== "") ? 
                             settings.FeedbackSession.toString() : (settings.CurrentSession || "0");
       
-      var phone = this.cleanPhone(phoneRaw);
-      var student = DB.getStudentByPhone(phone);
-      if (!student) {
-        throw new Error("رقم الهاتف غير مسجل.");
+      var phone = "ANONYMOUS";
+      var nameAr = "ANONYMOUS";
+      
+      var isAnonymous = !phoneRaw || phoneRaw.toString().trim() === "" || phoneRaw.toString().toUpperCase() === "ANONYMOUS";
+      
+      if (!isAnonymous) {
+        phone = this.cleanPhone(phoneRaw);
+        var student = DB.getStudentByPhone(phone);
+        if (!student) {
+          throw new Error("رقم الهاتف غير مسجل.");
+        }
+        
+        var existingFeedback = DB.getFeedbackResponse(phone, currentSession);
+        if (existingFeedback) {
+          return {
+            alreadySubmitted: true
+          };
+        }
+        
+        nameAr = student["Name AR"] || student["Name EN"] || "";
       }
       
-      var existingFeedback = DB.getFeedbackResponse(phone, currentSession);
-      if (existingFeedback) {
-        return {
-          alreadySubmitted: true
-        };
-      }
-      
-      var nameAr = student["Name AR"] || student["Name EN"] || "";
       DB.saveFeedbackResponse(phone, nameAr, currentSession, answers);
       
       return {

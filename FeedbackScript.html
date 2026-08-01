@@ -110,6 +110,13 @@
     // Update branding text
     updateBranding();
 
+    // Check if feedback is open
+    var isFeedbackOpen = (settings.Feedback && settings.Feedback.toString().toUpperCase() === "OPEN");
+    if (!isFeedbackOpen) {
+      showScreen("screen-feedback-closed");
+      return;
+    }
+
     // Check if phone number is passed in URL
     var urlPhone = "";
     try {
@@ -124,17 +131,20 @@
       urlPhone = urlParams.get('phone') || "";
     }
 
-    if (urlPhone) {
+    if (urlPhone && urlPhone.trim().replace(/[^\d]/g, "").length >= 8) {
       urlPhone = urlPhone.trim();
-      if (urlPhone.replace(/[^\d]/g, "").length >= 8) {
-        var phoneInput = document.getElementById('input-feedback-phone');
-        if (phoneInput) {
-          phoneInput.value = urlPhone;
-        }
-        state.phone = urlPhone;
-        showLoading("جاري التحقق من رقم الهاتف تلقائياً...");
-        callServerOption("checkFeedbackStatus", [urlPhone], onFeedbackStatusLoaded, onAuthError);
+      var phoneInput = document.getElementById('input-feedback-phone');
+      if (phoneInput) {
+        phoneInput.value = urlPhone;
       }
+      state.phone = urlPhone;
+      showLoading("جاري التحقق من رقم الهاتف تلقائياً...");
+      callServerOption("checkFeedbackStatus", [urlPhone], onFeedbackStatusLoaded, onAuthError);
+    } else {
+      state.phone = "ANONYMOUS";
+      document.getElementById("feedback-current-session-title").textContent = "تقييم: " + getSessionName(state.session);
+      showScreen("screen-feedback-questions");
+      updateFeedbackNavigation();
     }
   }
 
@@ -365,7 +375,7 @@
   }
 
   function showResultsScreen() {
-    document.getElementById("result-student-name").textContent = state.studentName;
+    document.getElementById("result-student-name").textContent = state.studentName || "مشاركة مجهولة (Anonymous)";
     showScreen("screen-feedback-result");
   }
 
