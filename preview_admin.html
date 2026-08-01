@@ -1445,6 +1445,21 @@
 
     isDataLoading = true;
 
+    // Update UI Form fields first so dropdown values are set
+    document.getElementById("admin-camp-title").textContent = res.settings.CampName;
+    document.getElementById("select-admin-session").value = res.settings.CurrentSession;
+    if (document.getElementById("select-admin-feedback-session")) {
+      document.getElementById("select-admin-feedback-session").value = res.settings.FeedbackSession || res.settings.CurrentSession;
+    }
+    document.getElementById("toggle-attendance-status").checked = (res.settings.Attendance === "OPEN");
+    document.getElementById("toggle-quiz-status").checked = (res.settings.Quiz === "OPEN");
+    document.getElementById("toggle-feedback-status").checked = (res.settings.Feedback === "OPEN");
+    document.getElementById("input-admin-camp-name").value = res.settings.CampName || "";
+    document.getElementById("input-admin-min-attendance").value = res.settings.MinAttendance;
+    document.getElementById("input-admin-logo-url").value = res.settings.LogoURL || "";
+    document.getElementById("input-admin-facebook-url").value = res.settings.FacebookURL || "";
+    document.getElementById("input-admin-new-pin").value = "";
+
     // Update UI Stats
     document.getElementById("stat-registered").textContent = res.stats.totalRegistered;
     document.getElementById("stat-attendees").textContent = res.stats.currentSessionAttendees;
@@ -1473,21 +1488,6 @@
       syncTimeStr = formatTimestamp(new Date());
     }
     document.getElementById("health-last-sync").textContent = syncTimeStr;
-
-    // Update UI Form fields
-    document.getElementById("admin-camp-title").textContent = res.settings.CampName;
-    document.getElementById("select-admin-session").value = res.settings.CurrentSession;
-    if (document.getElementById("select-admin-feedback-session")) {
-      document.getElementById("select-admin-feedback-session").value = res.settings.FeedbackSession || res.settings.CurrentSession;
-    }
-    document.getElementById("toggle-attendance-status").checked = (res.settings.Attendance === "OPEN");
-    document.getElementById("toggle-quiz-status").checked = (res.settings.Quiz === "OPEN");
-    document.getElementById("toggle-feedback-status").checked = (res.settings.Feedback === "OPEN");
-    document.getElementById("input-admin-camp-name").value = res.settings.CampName || "";
-    document.getElementById("input-admin-min-attendance").value = res.settings.MinAttendance;
-    document.getElementById("input-admin-logo-url").value = res.settings.LogoURL || "";
-    document.getElementById("input-admin-facebook-url").value = res.settings.FacebookURL || "";
-    document.getElementById("input-admin-new-pin").value = "";
 
     isDataLoading = false;
 
