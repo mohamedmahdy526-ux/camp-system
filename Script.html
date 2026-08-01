@@ -339,8 +339,7 @@
     
     if (res.status === 'ALREADY_ATTENDED') {
       currentPhoneStatus = "ALREADY_ATTENDED";
-      badge.classList.add('status-attended');
-      badge.innerHTML = "<span>⚠️</span><div>مرحباً بك يا " + res.studentName + "، لقد قمت بتسجيل حضورك في هذه المحاضرة بالفعل!</div>";
+      badge.style.display = 'none';
       
       arInput.value = res.studentName || "";
       enInput.value = res.nameEn || "";
@@ -350,6 +349,10 @@
       setFormFieldsDisabled(true);
       submitBtn.disabled = true;
       submitBtn.style.display = 'none';
+      
+      document.getElementById('already-student-name').textContent = "مرحباً بك يا " + res.studentName;
+      document.getElementById('already-session').textContent = getSessionDisplayName(res.session);
+      showModal('modal-already-attended');
       
     } else if (res.status === 'FOUND') {
       currentPhoneStatus = "FOUND";
