@@ -451,9 +451,9 @@ function cleanPhoneForCompare(phone) {
     str = str.replace(regex, i.toString());
   }
   var digits = str.replace(/[^\d]/g, "");
-  // Prepend missing leading zero if 10 digits starting with 1 (Egyptian numbers 010, 011, 012, 015)
-  if (digits.length === 10 && /^(10|11|12|15)/.test(digits)) {
-    digits = "0" + digits;
+  // Match using last 10 significant digits for flexible comparison (+201021508328 == 01021508328 == 1021508328)
+  if (digits.length >= 10) {
+    return digits.slice(-10);
   }
   return digits;
 }
