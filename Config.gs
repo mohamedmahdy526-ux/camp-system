@@ -4,6 +4,7 @@
  */
 
 var CONFIG = {
+  SYSTEM_VERSION: "75",
   SHEET_STUDENTS: "Students",
   SHEET_SETTINGS: "Settings",
   SHEET_LOG: "Attendance Log",

@@ -853,6 +853,75 @@
     }
   }
 
+  /**
+   * Resilient API call engine with Jittered Exponential Backoff and Idempotency.
+   */
+  function callServerOptionWithRetry(action, args, onSuccess, onFailure, options) {
+    options = options || {};
+    var maxRetries = options.maxRetries !== undefined ? options.maxRetries : 3;
+    var maxTimeoutMs = options.maxTimeoutMs || 10000;
+    var enableAutoRetry = options.enableAutoRetry !== undefined ? options.enableAutoRetry : true;
+    
+    var startTime = Date.now();
+    var attemptCount = 0;
+    
+    // Generate a single requestId ONCE per trigger for idempotency!
+    var requestId = options.requestId || ("req_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+    
+    if (action === "submitAttendance" || action === "registerStudentAndAttend") {
+      if (args.length === 1) {
+        args.push(requestId);
+      } else {
+        args[1] = requestId;
+      }
+    }
+    
+    function executeAttempt() {
+      attemptCount++;
+      
+      callServerOption(action, args, function(data) {
+        if (data && data.success === false) {
+          if (data.retryable && enableAutoRetry && shouldRetry()) {
+            scheduleRetry();
+          } else {
+            if (onFailure) onFailure(new Error(data.message || data.error || "حدث خطأ أثناء معالجة الطلب"));
+          }
+          return;
+        }
+        
+        console.info("[Telemetry] Action:", action, "| Attempts:", attemptCount, "| TotalMs:", Date.now() - startTime, "| Result: SUCCESS");
+        if (onSuccess) onSuccess(data);
+      }, function(err) {
+        if (enableAutoRetry && shouldRetry()) {
+          scheduleRetry();
+        } else {
+          console.info("[Telemetry] Action:", action, "| Attempts:", attemptCount, "| TotalMs:", Date.now() - startTime, "| Result: FAILED");
+          if (onFailure) onFailure(err);
+        }
+      });
+    }
+    
+    function shouldRetry() {
+      var elapsedTime = Date.now() - startTime;
+      return attemptCount < maxRetries && elapsedTime < maxTimeoutMs;
+    }
+    
+    function scheduleRetry() {
+      var backoffMs = 0;
+      if (attemptCount === 1) {
+        backoffMs = 1200 + Math.floor(Math.random() * 600); // 1200ms - 1800ms
+        showLoading("جاري تأكيد التسجيل... يرجى الانتظار لحظات ⏳");
+      } else if (attemptCount === 2) {
+        backoffMs = 2800 + Math.floor(Math.random() * 700); // 2800ms - 3500ms
+        showLoading("جاري اللمسات الأخيرة لتسجيلك... 🎯");
+      }
+      
+      setTimeout(executeAttempt, backoffMs);
+    }
+    
+    executeAttempt();
+  }
+
   // On Document Ready
   document.addEventListener('DOMContentLoaded', function() {
     initApp();
@@ -1181,7 +1250,7 @@
       
       // Automatic Instant Attendance for registered students
       showLoading("أهلاً بك يا " + res.studentName + "... جاري تسجيل حضورك تلقائياً! 🚀");
-      callServerOption("submitAttendance", [lastCheckedPhone], onAttendanceRegistered, onAttendanceError);
+      callServerOptionWithRetry("submitAttendance", [lastCheckedPhone], onAttendanceRegistered, onAttendanceError);
       
     } else if (res.status === 'NOT_FOUND') {
       currentPhoneStatus = "NOT_FOUND";
@@ -1315,12 +1384,12 @@
 
       showLoading("جاري حفظ البيانات وتسجيل حضورك...");
       
-      callServerOption("registerStudentAndAttend", [studentData], onAttendanceRegistered, onRegisterError);
+      callServerOptionWithRetry("registerStudentAndAttend", [studentData], onAttendanceRegistered, onRegisterError);
       
     } else {
       showLoading("جاري تسجيل حضورك...");
       
-      callServerOption("submitAttendance", [phone], onAttendanceRegistered, onAttendanceError);
+      callServerOptionWithRetry("submitAttendance", [phone], onAttendanceRegistered, onAttendanceError);
     }
   }
 

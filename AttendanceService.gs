@@ -158,165 +158,312 @@ var AttendanceService = {
    * @param {object} studentData Input data from the frontend.
    * @returns {object} Success metadata.
    */
-  registerAndAttend: function(studentData) {
+  /**
+   * Registers a new student and records their attendance in one transaction.
+   * Uses a Micro-Scoped Lock around critical writes and Idempotency caching.
+   * @param {object} studentData Input data from the frontend.
+   * @param {string} [requestId] Client idempotency request key.
+   * @returns {object} Success metadata.
+   */
+  registerAndAttend: function(studentData, requestId) {
+    var startTime = Date.now();
+    
+    // 1. Idempotency Check in CacheService (0ms overhead)
+    if (requestId) {
+      try {
+        var cached = CacheService.getScriptCache().get("REQ_" + requestId);
+        if (cached) {
+          var parsed = JSON.parse(cached);
+          return {
+            success: true,
+            alreadyMarked: parsed.alreadyMarked || false,
+            studentName: parsed.studentName,
+            session: parsed.session,
+            campName: parsed.campName,
+            processingTimeMs: Date.now() - startTime,
+            serverTime: new Date().toISOString(),
+            version: CONFIG.SYSTEM_VERSION,
+            requestId: requestId
+          };
+        }
+      } catch(e) {}
+    }
+    
+    // 2. Read & Validate OUTSIDE Lock
+    var settings = getSettings();
+    if ((settings.Attendance || "").toString().toUpperCase() !== "OPEN") {
+      return {
+        success: false,
+        retryable: false,
+        code: "ATTENDANCE_CLOSED",
+        message: "تسجيل الحضور مغلق حالياً."
+      };
+    }
+    
+    var phone = this.cleanPhone(studentData.Phone);
+    if (!phone || phone.length < 8) {
+      return {
+        success: false,
+        retryable: false,
+        code: "INVALID_PHONE",
+        message: "يرجى إدخال رقم هاتف صحيح."
+      };
+    }
+    
+    // Check duplicate student
+    var existing = DB.getStudentByPhone(phone);
+    if (existing) {
+      return {
+        success: false,
+        retryable: false,
+        code: "ALREADY_REGISTERED",
+        message: "رقم الهاتف هذا مسجل بالفعل باسم: " + (existing["Name AR"] || existing["Name EN"]) + ". يرجى العودة وتسجيل الحضور مباشرة."
+      };
+    }
+    
+    // Validations (Arabic and English Names, minimum 3 names)
+    var nameArRegex = /^[\u0600-\u06FF\s]+$/;
+    var nameEnRegex = /^[a-zA-Z\s]+$/;
+    
+    var cleanAr = (studentData.NameAr || "").trim();
+    var cleanEn = (studentData.NameEn || "").trim();
+    
+    if (!cleanAr || !nameArRegex.test(cleanAr) || cleanAr.split(/\s+/).length < 3) {
+      return {
+        success: false,
+        retryable: false,
+        code: "INVALID_NAME_AR",
+        message: "الاسم باللغة العربية يجب أن يتكون من حروف عربية فقط ويجب أن يكون ثلاثياً على الأقل."
+      };
+    }
+    if (!cleanEn || !nameEnRegex.test(cleanEn) || cleanEn.split(/\s+/).length < 3) {
+      return {
+        success: false,
+        retryable: false,
+        code: "INVALID_NAME_EN",
+        message: "الاسم باللغة الإنجليزية يجب أن يتكون من حروف إنجليزية فقط ويجب أن يكون ثلاثياً على الأقل."
+      };
+    }
+    if (!studentData.University || studentData.University.trim().length < 2) {
+      return {
+        success: false,
+        retryable: false,
+        code: "INVALID_UNIVERSITY",
+        message: "يرجى إدخال اسم الجامعة بشكل صحيح."
+      };
+    }
+    if (!studentData.Email || !this.isValidEmail(studentData.Email.trim())) {
+      return {
+        success: false,
+        retryable: false,
+        code: "INVALID_EMAIL",
+        message: "البريد الإلكتروني المدخل غير صحيح."
+      };
+    }
+    
+    var currentSession = settings.CurrentSession || "1";
+    var sessionKey = this.getSessionKey(currentSession);
+    
+    // Build student record with precalculated initial metrics
+    var newStudent = {
+      "Phone": studentData.Phone.toString().trim(),
+      "Name AR": studentData.NameAr.trim(),
+      "Name EN": this.toTitleCase(studentData.NameEn.trim()),
+      "University": studentData.University.trim(),
+      "Email": studentData.Email.trim().toLowerCase(),
+      "Total Attended": 1,
+      "Attendance Rate": "6.7%",
+      "Certificate Eligible": false
+    };
+    newStudent[sessionKey] = true;
+    
+    // 3. MICRO-SCOPED LOCK around Writes ONLY (<30ms lock window)
     var lock = LockService.getScriptLock();
-    // Wait up to 30 seconds for lock
-    var success = lock.tryLock(30000);
-    if (!success) {
-      throw new Error("خادم قاعدة البيانات مشغول حالياً، يرجى المحاولة مرة أخرى.");
+    var lockAcquired = lock.tryLock(10000);
+    if (!lockAcquired) {
+      return {
+        success: false,
+        retryable: true,
+        code: "SERVER_BUSY",
+        message: "خادم قاعدة البيانات مشغول حالياً، يرجى المحاولة مرة أخرى."
+      };
     }
     
     try {
-      var settings = getSettings();
-      if ((settings.Attendance || "").toString().toUpperCase() !== "OPEN") {
-        throw new Error("تسجيل الحضور مغلق حالياً.");
-      }
-      
-      var phone = this.cleanPhone(studentData.Phone);
-      if (!phone || phone.length < 8) {
-        throw new Error("يرجى إدخال رقم هاتف صحيح.");
-      }
-      
-      // Check duplicate student
-      var existing = DB.getStudentByPhone(phone);
-      if (existing) {
-        throw new Error("رقم الهاتف هذا مسجل بالفعل باسم: " + (existing["Name AR"] || existing["Name EN"]) + ". يرجى العودة وتسجيل الحضور مباشرة.");
-      }
-      
-      // Validations (Arabic and English Names, minimum 3 names)
-      var nameArRegex = /^[\u0600-\u06FF\s]+$/;
-      var nameEnRegex = /^[a-zA-Z\s]+$/;
-      
-      var cleanAr = studentData.NameAr.trim();
-      var cleanEn = studentData.NameEn.trim();
-      
-      if (!cleanAr || !nameArRegex.test(cleanAr) || cleanAr.split(/\s+/).length < 3) {
-        throw new Error("الاسم باللغة العربية يجب أن يتكون من حروف عربية فقط ويجب أن يكون ثلاثياً على الأقل.");
-      }
-      if (!cleanEn || !nameEnRegex.test(cleanEn) || cleanEn.split(/\s+/).length < 3) {
-        throw new Error("الاسم باللغة الإنجليزية يجب أن يتكون من حروف إنجليزية فقط ويجب أن يكون ثلاثياً على الأقل.");
-      }
-      if (!studentData.University || studentData.University.trim().length < 2) {
-        throw new Error("يرجى إدخال اسم الجامعة بشكل صحيح.");
-      }
-      if (!studentData.Email || !this.isValidEmail(studentData.Email.trim())) {
-        throw new Error("البريد الإلكتروني المدخل غير صحيح.");
-      }
-      
-      var currentSession = settings.CurrentSession || "1";
-      var sessionKey = this.getSessionKey(currentSession);
-      
-      // Build student record with precalculated initial metrics
-      var newStudent = {
-        "Phone": studentData.Phone.toString().trim(),
-        "Name AR": studentData.NameAr.trim(),
-        "Name EN": this.toTitleCase(studentData.NameEn.trim()),
-        "University": studentData.University.trim(),
-        "Email": studentData.Email.trim().toLowerCase(),
-        "Total Attended": 1,
-        "Attendance Rate": "6.7%",
-        "Certificate Eligible": false
-      };
-      
-      // Mark current session as True
-      newStudent[sessionKey] = true;
-      
-      // Append student to sheet
       DB.addStudent(newStudent);
-      
-      // Log attendance event
       DB.logAttendance(phone, currentSession);
-      
-      return {
-        success: true,
-        studentName: newStudent["Name AR"],
-        session: currentSession,
-        campName: settings.CampName
-      };
-      
     } finally {
       lock.releaseLock();
     }
+    
+    // 4. Store Minimal Payload in CacheService for Idempotency (300s TTL)
+    if (requestId) {
+      try {
+        var minPayload = {
+          status: "SUCCESS",
+          studentName: newStudent["Name AR"],
+          session: currentSession,
+          campName: settings.CampName,
+          alreadyMarked: false,
+          timestamp: Date.now()
+        };
+        CacheService.getScriptCache().put("REQ_" + requestId, JSON.stringify(minPayload), 300);
+      } catch(e) {}
+    }
+    
+    return {
+      success: true,
+      alreadyMarked: false,
+      studentName: newStudent["Name AR"],
+      session: currentSession,
+      campName: settings.CampName,
+      processingTimeMs: Date.now() - startTime,
+      serverTime: new Date().toISOString(),
+      version: CONFIG.SYSTEM_VERSION,
+      requestId: requestId || ""
+    };
   },
 
   /**
    * Submits attendance for an existing student.
-   * @param {string} phoneRaw
+   * Uses a Micro-Scoped Lock around critical writes and Idempotency caching.
+   * @param {string} phoneRaw Student phone.
+   * @param {string} [requestId] Client idempotency request key.
    * @returns {object} Success metadata.
    */
-  submitAttendance: function(phoneRaw) {
+  submitAttendance: function(phoneRaw, requestId) {
+    var startTime = Date.now();
+    
+    // 1. Idempotency Check in CacheService (0ms overhead)
+    if (requestId) {
+      try {
+        var cached = CacheService.getScriptCache().get("REQ_" + requestId);
+        if (cached) {
+          var parsed = JSON.parse(cached);
+          return {
+            success: true,
+            alreadyMarked: parsed.alreadyMarked || false,
+            studentName: parsed.studentName,
+            session: parsed.session,
+            campName: parsed.campName,
+            processingTimeMs: Date.now() - startTime,
+            serverTime: new Date().toISOString(),
+            version: CONFIG.SYSTEM_VERSION,
+            requestId: requestId
+          };
+        }
+      } catch(e) {}
+    }
+    
+    // 2. Read & Validate OUTSIDE Lock
+    var settings = getSettings();
+    if ((settings.Attendance || "").toString().toUpperCase() !== "OPEN") {
+      return {
+        success: false,
+        retryable: false,
+        code: "ATTENDANCE_CLOSED",
+        message: "تسجيل الحضور مغلق حالياً."
+      };
+    }
+    
+    var phone = this.cleanPhone(phoneRaw);
+    var student = DB.getStudentByPhone(phone);
+    if (!student) {
+      return {
+        success: false,
+        retryable: false,
+        code: "STUDENT_NOT_FOUND",
+        message: "الطالب غير مسجل في النظام."
+      };
+    }
+    
+    var currentSession = settings.CurrentSession || "1";
+    var sessionKey = this.getSessionKey(currentSession);
+    var studentName = student["Name AR"] || student["Name EN"];
+    
+    var alreadyAttended = student[sessionKey] === true || student[sessionKey] === "TRUE" || student[sessionKey] === "true";
+    if (alreadyAttended) {
+      return {
+        success: true,
+        alreadyMarked: true,
+        studentName: studentName,
+        session: currentSession,
+        campName: settings.CampName,
+        processingTimeMs: Date.now() - startTime,
+        serverTime: new Date().toISOString(),
+        version: CONFIG.SYSTEM_VERSION,
+        requestId: requestId || ""
+      };
+    }
+    
+    // Prepare updates in memory
+    student[sessionKey] = true;
+    var totalSessions = 15;
+    var attendedCount = 0;
+    for (var i = 1; i <= totalSessions; i++) {
+      var sKey = this.getSessionKey(i);
+      var val = student[sKey];
+      if (val === true || val === "TRUE" || val === "true") {
+        attendedCount++;
+      }
+    }
+    
+    var rateValue = totalSessions > 0 ? (attendedCount / totalSessions) : 0;
+    var attendanceRateStr = (rateValue * 100).toFixed(1) + "%";
+    var minAttendance = settings.MinAttendance || 12;
+    var eligible = attendedCount >= minAttendance;
+    
+    var updates = {};
+    updates[sessionKey] = true;
+    updates["Total Attended"] = attendedCount;
+    updates["Attendance Rate"] = attendanceRateStr;
+    updates["Certificate Eligible"] = eligible;
+    
+    // 3. MICRO-SCOPED LOCK around Writes ONLY (<30ms lock window)
     var lock = LockService.getScriptLock();
-    var success = lock.tryLock(30000);
-    if (!success) {
-      throw new Error("خادم قاعدة البيانات مشغول حالياً، يرجى المحاولة مرة أخرى.");
+    var lockAcquired = lock.tryLock(10000);
+    if (!lockAcquired) {
+      return {
+        success: false,
+        retryable: true,
+        code: "SERVER_BUSY",
+        message: "خادم قاعدة البيانات مشغول حالياً، يرجى المحاولة مرة أخرى."
+      };
     }
     
     try {
-      var settings = getSettings();
-      if ((settings.Attendance || "").toString().toUpperCase() !== "OPEN") {
-        throw new Error("تسجيل الحضور مغلق حالياً.");
-      }
-      
-      var phone = this.cleanPhone(phoneRaw);
-      var student = DB.getStudentByPhone(phone);
-      if (!student) {
-        throw new Error("الطالب غير مسجل في النظام.");
-      }
-      
-      var currentSession = settings.CurrentSession || "1";
-      var sessionKey = this.getSessionKey(currentSession);
-      
-      var alreadyAttended = student[sessionKey] === true || student[sessionKey] === "TRUE" || student[sessionKey] === "true";
-      if (alreadyAttended) {
-        return {
-          success: true,
-          alreadyMarked: true,
-          studentName: student["Name AR"] || student["Name EN"],
-          session: currentSession,
-          campName: settings.CampName
-        };
-      }
-      
-      // Mark session as true in memory and recalculate metrics
-      student[sessionKey] = true;
-      
-      var totalSessions = 15;
-      var attendedCount = 0;
-      for (var i = 1; i <= totalSessions; i++) {
-        var sKey = this.getSessionKey(i);
-        var val = student[sKey];
-        if (val === true || val === "TRUE" || val === "true") {
-          attendedCount++;
-        }
-      }
-      
-      var rateValue = totalSessions > 0 ? (attendedCount / totalSessions) : 0;
-      var attendanceRateStr = (rateValue * 100).toFixed(1) + "%";
-      var minAttendance = settings.MinAttendance || 12;
-      var eligible = attendedCount >= minAttendance;
-      
-      var updates = {};
-      updates[sessionKey] = true;
-      updates["Total Attended"] = attendedCount;
-      updates["Attendance Rate"] = attendanceRateStr;
-      updates["Certificate Eligible"] = eligible;
-      
-      // Single batch row update using known _rowIndex
       DB.updateStudentFields(phone, updates, student._rowIndex);
-      
-      // Log event
       DB.logAttendance(phone, currentSession);
-      
-      return {
-        success: true,
-        studentName: student["Name AR"] || student["Name EN"],
-        session: currentSession,
-        campName: settings.CampName
-      };
-      
     } finally {
       lock.releaseLock();
     }
+    
+    // 4. Store Minimal Payload in CacheService for Idempotency (300s TTL)
+    if (requestId) {
+      try {
+        var minPayload = {
+          status: "SUCCESS",
+          studentName: studentName,
+          session: currentSession,
+          campName: settings.CampName,
+          alreadyMarked: false,
+          timestamp: Date.now()
+        };
+        CacheService.getScriptCache().put("REQ_" + requestId, JSON.stringify(minPayload), 300);
+      } catch(e) {}
+    }
+    
+    return {
+      success: true,
+      alreadyMarked: false,
+      studentName: studentName,
+      session: currentSession,
+      campName: settings.CampName,
+      processingTimeMs: Date.now() - startTime,
+      serverTime: new Date().toISOString(),
+      version: CONFIG.SYSTEM_VERSION,
+      requestId: requestId || ""
+    };
   },
 
   /**

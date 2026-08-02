@@ -791,6 +791,52 @@
     }
   }
 
+  /**
+   * Resilient API call engine with Jittered Exponential Backoff.
+   */
+  function callServerOptionWithRetry(action, args, onSuccess, onFailure, options) {
+    options = options || {};
+    var maxRetries = options.maxRetries !== undefined ? options.maxRetries : 3;
+    var maxTimeoutMs = options.maxTimeoutMs || 10000;
+    var enableAutoRetry = options.enableAutoRetry !== undefined ? options.enableAutoRetry : true;
+    
+    var startTime = Date.now();
+    var attemptCount = 0;
+    
+    function executeAttempt() {
+      attemptCount++;
+      callServerOption(action, args, function(data) {
+        if (data && data.success === false) {
+          if (data.retryable && enableAutoRetry && shouldRetry()) {
+            scheduleRetry();
+          } else {
+            if (onFailure) onFailure(new Error(data.message || data.error || "حدث خطأ أثناء معالجة الطلب"));
+          }
+          return;
+        }
+        if (onSuccess) onSuccess(data);
+      }, function(err) {
+        if (enableAutoRetry && shouldRetry()) {
+          scheduleRetry();
+        } else {
+          if (onFailure) onFailure(err);
+        }
+      });
+    }
+    
+    function shouldRetry() {
+      var elapsedTime = Date.now() - startTime;
+      return attemptCount < maxRetries && elapsedTime < maxTimeoutMs;
+    }
+    
+    function scheduleRetry() {
+      var backoffMs = (attemptCount === 1) ? (1200 + Math.floor(Math.random() * 600)) : (2800 + Math.floor(Math.random() * 700));
+      setTimeout(executeAttempt, backoffMs);
+    }
+    
+    executeAttempt();
+  }
+
   var sessionsGuideList = [
     "التمهيد والترحيب (Opening & Orientation)",
     "Session 1: Interview Skills, CV Writing & LinkedIn",

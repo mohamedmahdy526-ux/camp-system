@@ -10,6 +10,22 @@
  * @returns {HtmlOutput} Evaluated HTML template.
  */
 function doGet(e) {
+  if (e && e.parameter && e.parameter.api === "true") {
+    try {
+      var action = e.parameter.action;
+      var args = [];
+      if (e.parameter.args) {
+        try { args = JSON.parse(e.parameter.args); } catch(pe) {}
+      }
+      var res = processApiAction(action, args);
+      return ContentService.createTextOutput(JSON.stringify(res))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({ error: err.message }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
   var page = (e && e.parameter && e.parameter.page) ? e.parameter.page.toString().toLowerCase() : "attendance";
   
   if (page === "quiz") {
@@ -81,26 +97,41 @@ function checkStudentStatus(phone) {
  * @param {string} phone Student phone.
  * @returns {object} Success or error status.
  */
-function submitAttendance(phone) {
+function submitAttendance(phone, requestId) {
   try {
-    return AttendanceService.submitAttendance(phone);
+    return AttendanceService.submitAttendance(phone, requestId);
   } catch (e) {
     Logger.log("API Error submitAttendance: " + e.message);
-    return { error: e.message };
+    var isLockOrBusy = /busy|locked|lock|timeout|خادم/i.test(e.message);
+    return {
+      success: false,
+      retryable: isLockOrBusy,
+      code: isLockOrBusy ? "SERVER_BUSY" : "SUBMIT_ERROR",
+      error: e.message,
+      message: e.message
+    };
   }
 }
 
 /**
  * Registers a new student and records their attendance.
  * @param {object} studentData Key-value student record data from frontend.
+ * @param {string} [requestId] Client idempotency request key.
  * @returns {object} Success or error status.
  */
-function registerStudentAndAttend(studentData) {
+function registerStudentAndAttend(studentData, requestId) {
   try {
-    return AttendanceService.registerAndAttend(studentData);
+    return AttendanceService.registerAndAttend(studentData, requestId);
   } catch (e) {
     Logger.log("API Error registerStudentAndAttend: " + e.message);
-    return { error: e.message };
+    var isLockOrBusy = /busy|locked|lock|timeout|خادم/i.test(e.message);
+    return {
+      success: false,
+      retryable: isLockOrBusy,
+      code: isLockOrBusy ? "SERVER_BUSY" : "REGISTER_ERROR",
+      error: e.message,
+      message: e.message
+    };
   }
 }
 
@@ -494,44 +525,61 @@ function setSettingValue(key, value) {
   SpreadsheetApp.flush();
 }
 
+function processApiAction(action, args) {
+  args = args || [];
+  if (action === "getSystemSettings") {
+    return getSystemSettings();
+  } else if (action === "checkStudentStatus") {
+    return checkStudentStatus(args[0]);
+  } else if (action === "submitAttendance") {
+    return submitAttendance(args[0], args[1]);
+  } else if (action === "registerStudentAndAttend") {
+    return registerStudentAndAttend(args[0], args[1]);
+  } else if (action === "checkQuizStatus") {
+    return checkQuizStatus(args[0]);
+  } else if (action === "getQuizQuestionsForSession") {
+    return getQuizQuestionsForSession(args[0]);
+  } else if (action === "submitQuizAnswers") {
+    return submitQuizAnswers(args[0], args[1]);
+  } else if (action === "checkFeedbackStatus") {
+    return checkFeedbackStatus(args[0]);
+  } else if (action === "submitFeedbackAnswers") {
+    return submitFeedbackAnswers(args[0], args[1]);
+  } else if (action === "getAdminDashboardData") {
+    return getAdminDashboardData(args[0]);
+  } else if (action === "verifyAdminPIN") {
+    return verifyAdminPIN(args[0]);
+  } else if (action === "updateAdminSettings") {
+    return updateAdminSettings(args[0], args[1]);
+  } else {
+    throw new Error("Action not supported: " + action);
+  }
+}
+
 /**
  * Handles API POST requests from external domains (e.g. GitHub Pages).
  * Acts as a router to expose server functions via REST JSON.
  */
 function doPost(e) {
   try {
-    var requestData = JSON.parse(e.postData.contents);
+    var requestData;
+    if (e && e.postData && e.postData.contents) {
+      try {
+        requestData = JSON.parse(e.postData.contents);
+      } catch(pe) {
+        requestData = e.parameter || {};
+      }
+    } else {
+      requestData = (e && e.parameter) ? e.parameter : {};
+    }
+    
     var action = requestData.action;
     var args = requestData.args || [];
-    
-    var result;
-    if (action === "getSystemSettings") {
-      result = getSystemSettings();
-    } else if (action === "checkStudentStatus") {
-      result = checkStudentStatus(args[0]);
-    } else if (action === "submitAttendance") {
-      result = submitAttendance(args[0]);
-    } else if (action === "registerStudentAndAttend") {
-      result = registerStudentAndAttend(args[0]);
-    } else if (action === "checkQuizStatus") {
-      result = checkQuizStatus(args[0]);
-    } else if (action === "getQuizQuestionsForSession") {
-      result = getQuizQuestionsForSession(args[0]);
-    } else if (action === "submitQuizAnswers") {
-      result = submitQuizAnswers(args[0], args[1]);
-    } else if (action === "checkFeedbackStatus") {
-      result = checkFeedbackStatus(args[0]);
-    } else if (action === "submitFeedbackAnswers") {
-      result = submitFeedbackAnswers(args[0], args[1]);
-    } else if (action === "getAdminDashboardData") {
-      result = getAdminDashboardData(args[0]);
-    } else if (action === "verifyAdminPIN") {
-      result = verifyAdminPIN(args[0]);
-    } else if (action === "updateAdminSettings") {
-      result = updateAdminSettings(args[0], args[1]);
-    } else {
-      throw new Error("Action not supported: " + action);
+    if (typeof args === "string") {
+      try { args = JSON.parse(args); } catch(pa) {}
     }
+    
+    var result = processApiAction(action, args);
     
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
