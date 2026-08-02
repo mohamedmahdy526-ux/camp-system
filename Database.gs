@@ -111,31 +111,40 @@ var DB = {
 
   /**
    * Updates specific columns for a student identified by phone.
+   * Performs a single batch row update (setValues) to minimize Spreadsheet API calls.
    * @param {string} phone Student phone number.
    * @param {object} updatesMap Key-value pairs of headers to update.
+   * @param {number} [targetRowIndex] Optional known 1-based row index to skip lookup.
    */
-  updateStudentFields: function(phone, updatesMap) {
+  updateStudentFields: function(phone, updatesMap, targetRowIndex) {
     var ss = getActiveSpreadsheet();
     var sheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
     if (!sheet) throw new Error("Students sheet not found.");
     
-    var rowIndex = this.findStudentRowIndex(sheet, phone);
+    var rowIndex = targetRowIndex || this.findStudentRowIndex(sheet, phone);
     if (rowIndex === -1) {
       throw new Error("Student with phone " + phone + " not found for update.");
     }
     
     var headers = this.getHeaders(sheet);
+    if (headers.length === 0) return;
     
-    // Perform bulk range update or single cell updates?
+    var rowRange = sheet.getRange(rowIndex, 1, 1, headers.length);
+    var rowValues = rowRange.getValues()[0];
+    var modified = false;
+    
     for (var key in updatesMap) {
       if (updatesMap.hasOwnProperty(key)) {
         var colIndex = headers.indexOf(key);
-        if (colIndex === -1) {
-          Logger.log("Warning: Header '" + key + "' not found in Students sheet. Skipping update.");
-          continue;
+        if (colIndex !== -1) {
+          rowValues[colIndex] = updatesMap[key];
+          modified = true;
         }
-        sheet.getRange(rowIndex, colIndex + 1).setValue(updatesMap[key]);
       }
+    }
+    
+    if (modified) {
+      rowRange.setValues([rowValues]);
     }
   },
 

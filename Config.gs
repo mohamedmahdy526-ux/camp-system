@@ -29,8 +29,22 @@ function getActiveSpreadsheet() {
   return SpreadsheetApp.getActiveSpreadsheet();
 }
 
+function clearSettingsCache() {
+  try {
+    CacheService.getScriptCache().remove("APP_SETTINGS");
+  } catch(e) {}
+}
+
 function getSettings() {
   try {
+    var cache = CacheService.getScriptCache();
+    var cached = cache.get("APP_SETTINGS");
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch(e) {}
+    }
+
     var ss = getActiveSpreadsheet();
     if (!ss) {
       throw new Error("Active spreadsheet not found.");
@@ -88,18 +102,10 @@ function getSettings() {
       }
     }
     
-    // Ensure AdminPIN is populated in the sheet if it wasn't there
-    var hasPin = false;
-    for (var k in settings) {
-      if (k.toLowerCase() === "adminpin") {
-        hasPin = true;
-        break;
-      }
-    }
-    if (!hasPin) {
-      sheet.appendRow(["AdminPIN", "1234"]);
-      SpreadsheetApp.flush();
-    }
+    // Cache for 60 seconds (prevents sheet read overhead on high concurrency)
+    try {
+      cache.put("APP_SETTINGS", JSON.stringify(settings), 60);
+    } catch(e) {}
     
     return settings;
   } catch (e) {

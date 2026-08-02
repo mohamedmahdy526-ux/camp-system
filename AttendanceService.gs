@@ -206,13 +206,16 @@ var AttendanceService = {
       var currentSession = settings.CurrentSession || "1";
       var sessionKey = this.getSessionKey(currentSession);
       
-      // Build student record
+      // Build student record with precalculated initial metrics
       var newStudent = {
         "Phone": studentData.Phone.toString().trim(),
         "Name AR": studentData.NameAr.trim(),
         "Name EN": this.toTitleCase(studentData.NameEn.trim()),
         "University": studentData.University.trim(),
-        "Email": studentData.Email.trim().toLowerCase()
+        "Email": studentData.Email.trim().toLowerCase(),
+        "Total Attended": 1,
+        "Attendance Rate": "6.7%",
+        "Certificate Eligible": false
       };
       
       // Mark current session as True
@@ -220,9 +223,6 @@ var AttendanceService = {
       
       // Append student to sheet
       DB.addStudent(newStudent);
-      
-      // Calculate and update metrics
-      this.recalculateStudentMetrics(phone, settings.MinAttendance);
       
       // Log attendance event
       DB.logAttendance(phone, currentSession);
@@ -277,13 +277,32 @@ var AttendanceService = {
         };
       }
       
-      // Mark session as true
+      // Mark session as true in memory and recalculate metrics
+      student[sessionKey] = true;
+      
+      var totalSessions = 15;
+      var attendedCount = 0;
+      for (var i = 1; i <= totalSessions; i++) {
+        var sKey = this.getSessionKey(i);
+        var val = student[sKey];
+        if (val === true || val === "TRUE" || val === "true") {
+          attendedCount++;
+        }
+      }
+      
+      var rateValue = totalSessions > 0 ? (attendedCount / totalSessions) : 0;
+      var attendanceRateStr = (rateValue * 100).toFixed(1) + "%";
+      var minAttendance = settings.MinAttendance || 12;
+      var eligible = attendedCount >= minAttendance;
+      
       var updates = {};
       updates[sessionKey] = true;
-      DB.updateStudentFields(phone, updates);
+      updates["Total Attended"] = attendedCount;
+      updates["Attendance Rate"] = attendanceRateStr;
+      updates["Certificate Eligible"] = eligible;
       
-      // Recalculate metrics
-      this.recalculateStudentMetrics(phone, settings.MinAttendance);
+      // Single batch row update using known _rowIndex
+      DB.updateStudentFields(phone, updates, student._rowIndex);
       
       // Log event
       DB.logAttendance(phone, currentSession);
@@ -687,6 +706,7 @@ var AttendanceService = {
       }
     }
     
+    clearSettingsCache(); // Invalidate cache so all users pick up new settings instantly
     SpreadsheetApp.flush();
     return this.getAdminDashboardData(pin);
   },
@@ -775,6 +795,8 @@ var AttendanceService = {
         }
         
         nameAr = student["Name AR"] || student["Name EN"] || "";
+      } else if (answers && answers.studentName) {
+        nameAr = answers.studentName.toString().trim() || "ANONYMOUS";
       }
       
       DB.saveFeedbackResponse(phone, nameAr, currentSession, answers);

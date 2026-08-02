@@ -297,7 +297,7 @@
 
   function navigateFeedbackQuestion(direction) {
     var newIdx = state.currentQIndex + direction;
-    if (newIdx < 0 || newIdx >= 7) return;
+    if (newIdx < 0 || newIdx >= 8) return;
 
     // Hide current question
     document.getElementById("q-card-" + state.currentQIndex).classList.remove("active");
@@ -314,7 +314,7 @@
     document.getElementById("current-q-index").textContent = state.currentQIndex + 1;
     
     // Update progress bar
-    var progressPct = ((state.currentQIndex + 1) / 7) * 100;
+    var progressPct = ((state.currentQIndex + 1) / 8) * 100;
     document.getElementById("feedback-progress-fill").style.width = progressPct + "%";
 
     // Show / hide buttons
@@ -324,7 +324,7 @@
 
     btnPrev.disabled = (state.currentQIndex === 0);
     
-    if (state.currentQIndex === 6) {
+    if (state.currentQIndex === 7) {
       btnNext.style.display = "none";
       btnSubmit.style.display = "block";
     } else {
@@ -375,7 +375,15 @@
   }
 
   function showResultsScreen() {
-    document.getElementById("result-student-name").textContent = state.studentName || "مشاركة مجهولة (Anonymous)";
+    var displayName = state.studentName;
+    if (!displayName || displayName === "ANONYMOUS") {
+      if (state.answers && state.answers.studentName) {
+        displayName = state.answers.studentName;
+      } else {
+        displayName = "مشاركة مجهولة (Anonymous)";
+      }
+    }
+    document.getElementById("result-student-name").textContent = displayName;
     showScreen("screen-feedback-result");
   }
 
