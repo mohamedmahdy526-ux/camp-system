@@ -358,7 +358,7 @@
     } else if (res.status === 'FOUND') {
       currentPhoneStatus = "FOUND";
       badge.classList.add('status-registered');
-      badge.innerHTML = "<span>✓</span><div>طالب مسجل مسبقاً: أهلاً بك يا " + res.studentName + "! تفضل بتسجيل حضورك.</div>";
+      badge.innerHTML = "<span>✓</span><div>أهلاً بك يا " + res.studentName + "! جاري تسجيل حضورك تلقائياً...</div>";
       
       arInput.value = res.studentName || "";
       enInput.value = res.nameEn || "";
@@ -367,6 +367,10 @@
       
       setFormFieldsDisabled(true);
       submitBtn.textContent = "تسجيل حضور المحاضرة 📝";
+      
+      // Automatic Instant Attendance for registered students
+      showLoading("أهلاً بك يا " + res.studentName + "... جاري تسجيل حضورك تلقائياً! 🚀");
+      callServerOption("submitAttendance", [lastCheckedPhone], onAttendanceRegistered, onAttendanceError);
       
     } else if (res.status === 'NOT_FOUND') {
       currentPhoneStatus = "NOT_FOUND";
