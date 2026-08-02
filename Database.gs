@@ -187,6 +187,9 @@ var DB = {
     var rowValues = rowRange.getValues()[0];
     var modified = false;
     
+    var rangeStr = this.getSessionColumnRange(headers, rowIndex);
+    var targetMin = 12;
+    
     for (var key in updatesMap) {
       if (updatesMap.hasOwnProperty(key)) {
         var colIndex = headers.indexOf(key);
@@ -195,6 +198,17 @@ var DB = {
           modified = true;
         }
       }
+    }
+    
+    // Always preserve dynamic formulas for calculated metrics
+    if (rangeStr) {
+      var totIdx = headers.indexOf("Total Attended");
+      var rateIdx = headers.indexOf("Attendance Rate");
+      var eligIdx = headers.indexOf("Certificate Eligible");
+      
+      if (totIdx !== -1) rowValues[totIdx] = "=COUNTIF(" + rangeStr + ", TRUE)";
+      if (rateIdx !== -1) rowValues[rateIdx] = '=TEXT(COUNTIF(' + rangeStr + ', TRUE)/15, "0.0%")';
+      if (eligIdx !== -1) rowValues[eligIdx] = "=IF(COUNTIF(" + rangeStr + ", TRUE)>=" + targetMin + ", TRUE, FALSE)";
     }
     
     if (modified) {

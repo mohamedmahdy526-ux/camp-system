@@ -503,6 +503,25 @@ function adminAdvanceSession() {
   SpreadsheetApp.getUi().alert("تم الانتقال إلى: " + sessions[next] + " بنجاح!");
 }
 
+function onOpen() {
+  try {
+    var ui = SpreadsheetApp.getUi();
+    ui.createMenu("تطبيقات الكامب ⚙️")
+      .addItem("تحديث فرمولات الحساب التلقائي لجميع الطلاب 🔄", "menuApplyFormulas")
+      .addToUi();
+  } catch(e) {}
+}
+
+function menuApplyFormulas() {
+  try {
+    var settings = getSettings();
+    DB.applySheetFormulasToAllStudents(settings.MinAttendance);
+    SpreadsheetApp.getUi().alert("تمت إضافة صيغ الحساب التلقائي لجميع الصفوف في الشيت بنجاح! الآن أي تعديل يدوي سيحسب الحسابات فورياً.");
+  } catch(e) {
+    SpreadsheetApp.getUi().alert("حدث خطأ: " + e.message);
+  }
+}
+
 function applySheetFormulasToAllStudents() {
   try {
     var settings = getSettings();
