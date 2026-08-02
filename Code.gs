@@ -503,6 +503,16 @@ function adminAdvanceSession() {
   SpreadsheetApp.getUi().alert("تم الانتقال إلى: " + sessions[next] + " بنجاح!");
 }
 
+function applySheetFormulasToAllStudents() {
+  try {
+    var settings = getSettings();
+    DB.applySheetFormulasToAllStudents(settings.MinAttendance);
+    return { success: true, message: "تمت إضافة فرمولات الحساب التلقائي لجميع صفوف الشيت بنجاح." };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
 function setSettingValue(key, value) {
   var ss = getActiveSpreadsheet();
   var sheet = ss.getSheetByName(CONFIG.SHEET_SETTINGS);

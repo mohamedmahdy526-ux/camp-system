@@ -70,6 +70,56 @@ var DB = {
     return student;
   },
 
+  columnToLetter: function(column) {
+    var temp, letter = '';
+    while (column > 0) {
+      temp = (column - 1) % 26;
+      letter = String.fromCharCode(65 + temp) + letter;
+      column = Math.floor((column - temp - 1) / 26);
+    }
+    return letter;
+  },
+
+  getSessionColumnRange: function(headers, rowIndex) {
+    var startCol = -1;
+    var endCol = -1;
+    for (var i = 0; i < headers.length; i++) {
+      if (/^S([1-9]|1[0-5]):/.test(headers[i])) {
+        if (startCol === -1) startCol = i + 1;
+        endCol = i + 1;
+      }
+    }
+    if (startCol === -1 || endCol === -1) return null;
+    return this.columnToLetter(startCol) + rowIndex + ":" + this.columnToLetter(endCol) + rowIndex;
+  },
+
+  applySheetFormulasToAllStudents: function(minAttendance) {
+    var ss = getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(CONFIG.SHEET_STUDENTS);
+    if (!sheet) return;
+    
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return;
+    
+    var headers = this.getHeaders(sheet);
+    var totCol = headers.indexOf("Total Attended");
+    var rateCol = headers.indexOf("Attendance Rate");
+    var eligCol = headers.indexOf("Certificate Eligible");
+    
+    if (totCol === -1 || rateCol === -1 || eligCol === -1) return;
+    
+    var targetMin = minAttendance || 12;
+    
+    for (var r = 2; r <= lastRow; r++) {
+      var rangeStr = this.getSessionColumnRange(headers, r);
+      if (rangeStr) {
+        sheet.getRange(r, totCol + 1).setFormula("=COUNTIF(" + rangeStr + ", TRUE)");
+        sheet.getRange(r, rateCol + 1).setFormula('=TEXT(COUNTIF(' + rangeStr + ', TRUE)/15, "0.0%")');
+        sheet.getRange(r, eligCol + 1).setFormula("=IF(COUNTIF(" + rangeStr + ", TRUE)>=" + targetMin + ", TRUE, FALSE)");
+      }
+    }
+  },
+
   /**
    * Inserts a new student record using header mapping.
    * @param {object} studentData Key-value representation of the student.
@@ -83,6 +133,10 @@ var DB = {
     if (headers.length === 0) {
       throw new Error("No headers found in the Students sheet.");
     }
+    
+    var nextRow = sheet.getLastRow() + 1;
+    var rangeStr = this.getSessionColumnRange(headers, nextRow);
+    var targetMin = 12;
     
     // Construct the row array matching the order of the headers
     var row = headers.map(function(header) {
@@ -98,10 +152,10 @@ var DB = {
       if (/^S\d+:/.test(header)) {
         return false;
       }
-      // Defaults for calculated fields
-      if (header === "Total Attended") return 0;
-      if (header === "Attendance Rate") return 0;
-      if (header === "Certificate Eligible") return false;
+      // Automatic Formulas for calculated fields
+      if (header === "Total Attended") return rangeStr ? "=COUNTIF(" + rangeStr + ", TRUE)" : 1;
+      if (header === "Attendance Rate") return rangeStr ? '=TEXT(COUNTIF(' + rangeStr + ', TRUE)/15, "0.0%")' : "6.7%";
+      if (header === "Certificate Eligible") return rangeStr ? "=IF(COUNTIF(" + rangeStr + ", TRUE)>=" + targetMin + ", TRUE, FALSE)" : false;
       
       return "";
     });
