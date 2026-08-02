@@ -450,5 +450,10 @@ function cleanPhoneForCompare(phone) {
     var regex = new RegExp(arabicDigits[i], "g");
     str = str.replace(regex, i.toString());
   }
-  return str.replace(/[^\d]/g, "");
+  var digits = str.replace(/[^\d]/g, "");
+  // Prepend missing leading zero if 10 digits starting with 1 (Egyptian numbers 010, 011, 012, 015)
+  if (digits.length === 10 && /^(10|11|12|15)/.test(digits)) {
+    digits = "0" + digits;
+  }
+  return digits;
 }

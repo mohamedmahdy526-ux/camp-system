@@ -24,6 +24,11 @@ var AttendanceService = {
     
     // Remove everything that isn't a digit or '+'
     clean = clean.replace(/[^\d+]/g, "");
+    
+    // Prepend missing leading zero if 10 digits starting with 1 (Egyptian numbers 010, 011, 012, 015)
+    if (clean.length === 10 && /^(10|11|12|15)/.test(clean)) {
+      clean = "0" + clean;
+    }
     return clean;
   },
 
