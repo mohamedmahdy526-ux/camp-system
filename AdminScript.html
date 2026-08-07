@@ -10,27 +10,27 @@
 
   var sessionsGuideList = [
     "التمهيد والترحيب (Opening & Orientation)",
-    "Session 1: Interview Skills, CV Writing & LinkedIn",
-    "Session 2: Professional Autonomy & Accountability",
-    "Session 3: ECG Interpretation",
-    "Session 4: Medication Safety & High Alert Medications",
-    "Session 5: ABG Interpretation & Patient Deterioration",
-    "Session 6: Trauma, Stroke & Acute Coronary Syndrome",
-    "Session 7: Care of Mechanically Ventilated Patients",
-    "Session 8: Panic Situations - Lines, Tubes & Drains",
-    "Session 9: Code Blue Management & Crash Cart",
-    "Session 10: Infection Prevention and Control (IPC)",
-    "Session 11: Quality Improvement & Patient Safety",
-    "Session 12: Soft Skills",
-    "Session 13: Communication Skills, SBAR & Documentation",
-    "Session 14: Career Development & Opportunities",
+    "Interview Skills, CV Writing & LinkedIn",
+    "Professional Autonomy & Accountability",
+    "ECG Interpretation",
+    "Medication Safety & High Alert Medications",
+    "ABG Interpretation & Patient Deterioration",
+    "Trauma, Stroke & Acute Coronary Syndrome",
+    "Care of Mechanically Ventilated Patients",
+    "Panic Situations - Lines, Tubes & Drains",
+    "Code Blue Management & Crash Cart",
+    "Infection Prevention and Control (IPC)",
+    "Quality Improvement & Patient Safety",
+    "Soft Skills",
+    "Communication Skills, SBAR & Documentation",
+    "Career Development & Opportunities",
     "المناقشة المفتوحة وحفل الختام (Closing Ceremony)"
   ];
 
   function getSessionName(sessionVal) {
     var idx = parseInt(sessionVal.toString().trim(), 10);
     if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
-      return "S" + idx + ": " + sessionsGuideList[idx];
+      return sessionsGuideList[idx];
     }
     return "المحاضرة " + sessionVal;
   }
@@ -726,12 +726,13 @@
         return parseInt(s["Index"], 10) === idx;
       });
       if (sess) {
-        return "S" + idx + ": " + (sess["Session Topic"] || sess["Module"] || "");
+        var topic = sess["Session Topic"] || sess["Module"] || "";
+        return topic.replace(/^Session\s+\d+:\s*/i, "").replace(/^S\d+:\s*/i, "");
       }
     }
     
     if (!isNaN(idx) && idx >= 0 && idx < sessionsGuideList.length) {
-      return "S" + idx + ": " + sessionsGuideList[idx];
+      return sessionsGuideList[idx];
     }
     return "المحاضرة " + sessionVal;
   }
